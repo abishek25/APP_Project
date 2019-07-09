@@ -3,6 +3,8 @@ package model;
 public class Ship {
 	String name;
 	boolean holes[];
+	int row;
+	int col;
 	
 	public void initHoles(int numHoles) {
 		this.holes = new boolean[numHoles];
