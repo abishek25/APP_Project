@@ -2,8 +2,10 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -17,9 +19,11 @@ import model.Game;
 
 public class Window {
 	
+	JFrame gameFrame; 
 	GameController gameController;
 	JButton[][] lblAttackGrid;
 	JLabel[][] lblShipPlacementGrid;
+	JLabel turnLabel;
 	
 	public JMenuItem createNewGameMenuItem() {
 		JMenuItem newGame = new JMenuItem("New Game");
@@ -29,8 +33,29 @@ public class Window {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
+				String positions1 = JOptionPane.showInputDialog(""
+						+ "Please input placement positions for\n"
+						+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
+						+ "Comma Separated Values\n"
+						+ "Example: (A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6): ");
+				
+				positions1 = "(A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6)";
+				
+				while(Game.checkPositions(positions1) == false) {
+					positions1 = JOptionPane.showInputDialog("Incorrect positions. Try again: ");
+				}
+				
 				gameController = new GameController();
-				gameController.createGame(player1);
+				gameController.createGame(player1, positions1);
+				
+				createBoardDisplay(gameFrame);
+				
+				turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
+				turnLabel.setBounds(0, 600, 300, 50);
+				gameFrame.add(turnLabel);
+				
+				gameFrame.revalidate();
+				
 			}
 		});
 		
@@ -49,20 +74,28 @@ public class Window {
 		return menuBar;
 	}
 	
-	public void addBoard() {
+	public void refreshBoard() {
 		Board board = gameController.getGame().getGameBoard();
-		int[][] attackGrid = board.getAttackGrid();
 		boolean[][] shipPlacementGrid = board.getShipPlacementGrid();
 		
 		for(int i = 0; i < Board.BOARD_ROWS; i++) {
 			for(int j = 0; j < Board.BOARD_COLS; j++) {
-				
+				if(shipPlacementGrid[i][j] == true) {
+					lblShipPlacementGrid[i][j].setText("SHIP");
+				}
+				else {
+					lblShipPlacementGrid[i][j].setText("----");
+				}
 			}
 		}
 	}
+	
+	public String processCommand(int row, int col) {
+		String result = gameController.processAttack(row, col);
+		refreshBoard();
+		return result;
+	}
 
-	
-	
 	public void createBoardDisplay(JFrame f) {
 		lblAttackGrid = new JButton[Board.BOARD_ROWS][Board.BOARD_COLS];
 		lblShipPlacementGrid = new JLabel[Board.BOARD_ROWS][Board.BOARD_COLS];
@@ -88,7 +121,11 @@ public class Window {
 					lblAttackGrid[i][j].addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							System.out.println(e.getActionCommand());
+							String cmd = e.getActionCommand();
+							int row = cmd.charAt(0) - 65;
+							int col = Integer.parseInt(cmd.substring(1)) - 1;
+							processCommand(row, col);
+							lblAttackGrid[row][col].setEnabled(false);
 						}
 					});
 					
@@ -101,21 +138,22 @@ public class Window {
 				}
 			}
 		}
-	}
-	
-	public void displayBoard() {
 		
+		refreshBoard();
+	}
+
+	public void initMainFrame() {
+		JFrame.setDefaultLookAndFeelDecorated(true);
+	    gameFrame = new JFrame("BattleShip");
+	    gameFrame.setLayout(null);
+	    gameFrame.setSize(1200,800);
+	    gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    gameFrame.setJMenuBar(createMenu());
+	    gameFrame.setVisible(true);
 	}
 	
 	public void start() {
-		JFrame.setDefaultLookAndFeelDecorated(true);
-	    JFrame f = new JFrame("BattleShip");
-	    f.setSize(1200,800);
-	    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    f.setJMenuBar(createMenu());
-	    createBoardDisplay(f);
-	    f.setVisible(true);
-	    
+		initMainFrame();
 	}
 	
 	public static void main(String[] args) {
