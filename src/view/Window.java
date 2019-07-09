@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import controller.GameController;
 import model.Board;
 import model.Game;
+import model.Player;
 
 public class Window {
 	
@@ -76,12 +77,15 @@ public class Window {
 	
 	public void refreshBoard() {
 		Board board = gameController.getGame().getGameBoard();
-		boolean[][] shipPlacementGrid = board.getShipPlacementGrid();
+		int[][] shipPlacementGrid = board.getShipPlacementGrid();
 		
 		for(int i = 0; i < Board.BOARD_ROWS; i++) {
 			for(int j = 0; j < Board.BOARD_COLS; j++) {
-				if(shipPlacementGrid[i][j] == true) {
+				if(shipPlacementGrid[i][j] == Board.PLACEMENT_BOARD_SHIP) {
 					lblShipPlacementGrid[i][j].setText("SHIP");
+				}
+				else if(shipPlacementGrid[i][j] == Board.PLACEMENT_BOARD_SHIP_HIT) {
+					lblShipPlacementGrid[i][j].setText("*HIT");
 				}
 				else {
 					lblShipPlacementGrid[i][j].setText("----");
@@ -104,10 +108,10 @@ public class Window {
 			for(int j = 0; j < Board.BOARD_COLS + 1; j++) {
 				if(i == Board.BOARD_ROWS || j == Board.BOARD_COLS) {
 					JLabel lbl = new JLabel("");
-					lbl.setBounds((60 * i), (60 * j), 200, 50);
+					lbl.setBounds((70 * i), (70 * j), 200, 50);
 					
 					JLabel lbl2 = new JLabel("");
-					lbl2.setBounds(600 + (60 * i), (60 * j), 200, 50);
+					lbl2.setBounds(600 + (70 * i), (70 * j), 200, 50);
 					
 					f.add(lbl);
 					f.add(lbl2);
@@ -116,7 +120,7 @@ public class Window {
 					//JLabel lbl = new JLabel("-----");
 					JButton btn = new JButton(("" + (char)(65 + i)) + (j + 1));
 					lblAttackGrid[i][j] = btn;
-					lblAttackGrid[i][j].setBounds(600 + (60 * i), (60 * j), 60, 60);
+					lblAttackGrid[i][j].setBounds(600 + (70 * i), (70 * j), 70, 70);
 					//lblAttackGrid[i][j].setLocation(40 * i, 40 * j);
 					lblAttackGrid[i][j].addActionListener(new ActionListener() {
 						@Override
@@ -124,14 +128,20 @@ public class Window {
 							String cmd = e.getActionCommand();
 							int row = cmd.charAt(0) - 65;
 							int col = Integer.parseInt(cmd.substring(1)) - 1;
-							processCommand(row, col);
+							String result = processCommand(row, col);
+							if(result.equals(Player.ATTACK_HIT)) {
+								lblAttackGrid[row][col].setText("*HIT");
+							}
+							else {
+								lblAttackGrid[row][col].setText("MISS");
+							}
 							lblAttackGrid[row][col].setEnabled(false);
 						}
 					});
 					
 					JLabel lbl2 = new JLabel("-----");
 					lblShipPlacementGrid[i][j] = lbl2;
-					lblShipPlacementGrid[i][j].setBounds((60 * i), (60 * j), 200, 50);
+					lblShipPlacementGrid[i][j].setBounds((70 * i), (70 * j), 200, 50);
 					
 					f.add(lblAttackGrid[i][j]);
 					f.add(lblShipPlacementGrid[i][j]);

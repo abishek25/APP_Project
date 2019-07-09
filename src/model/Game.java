@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Game {
@@ -57,7 +59,57 @@ public class Game {
 		return this.players[currPlayer];
 	}
 	
+	public void generateAiAttack() {
+		ArrayList<String> possiblepairs = new ArrayList<String>();
+		
+		for(int i = 0; i < Board.BOARD_ROWS; i++) {
+			for(int j = 0; j < Board.BOARD_COLS; j++) {
+				if(players[1].board.attack_grid[i][j] == Board.BOARD_EMPTY) {
+					possiblepairs.add(String.valueOf(i) + "," + String.valueOf(j));
+				}
+			}
+		}
+		
+		Collections.shuffle(possiblepairs);
+		int row = Integer.parseInt(possiblepairs.get(0).split(",")[0]);
+		int col = Integer.parseInt(possiblepairs.get(0).split(",")[1]);
+		String result = players[0].checkAttack(row, col);
+		if(result.equals(Player.ATTACK_HIT)) {
+			players[1].board.attack_grid[row][col] = Board.BOARD_HIT;
+		}
+		else if(result.equals(Player.ATTACK_MISS)){
+			players[1].board.attack_grid[row][col] = Board.BOARD_MISS;
+		}
+		else {
+			//
+		}
+		System.out.println("AI Attack Result For (" + row + "," + col + "): " + result);
+	}
+	
 	public String processAttack(int row, int col) {
-		return "";
+		String result = "";
+		if(getGameMode() == GAME_MODE_AI) {
+			result = players[1].checkAttack(row, col);
+			System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
+			if(result.equals(Player.ATTACK_HIT)) {
+				players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+			}
+			else {
+				players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+			}
+			generateAiAttack();
+		}
+		else {
+			if(currPlayer == 0) {
+				result = players[1].checkAttack(row, col);
+				currPlayer = 1;
+			}
+			else if(currPlayer == 1) {
+				result = players[0].checkAttack(row, col);
+				currPlayer = 0;
+			}
+		}
+		
+		return result;
 	}
 }

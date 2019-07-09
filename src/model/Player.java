@@ -3,6 +3,10 @@ package model;
 import java.util.StringTokenizer;
 
 public class Player {
+	
+	public static String ATTACK_HIT = "Attack was success";
+	public static String ATTACK_MISS = "Attack was missed";
+	
 	String name;
 	Ship[] ships;
 	Board board;
@@ -25,12 +29,12 @@ public class Player {
 		
 		if(row == row2) {
 			for(int i = col; i <= col2; i++) {
-				board.ship_placement_grid[row][i] = true;
+				board.ship_placement_grid[row][i] = Board.PLACEMENT_BOARD_SHIP;
 			}
 		}
 		else if(col == col2) {
 			for(int i = col; i <= col2; i++) {
-				board.ship_placement_grid[row][i] = true;
+				board.ship_placement_grid[row][i] = Board.PLACEMENT_BOARD_SHIP;
 			}
 		}
 	}
@@ -60,5 +64,22 @@ public class Player {
 	
 	public Board getBoard() {
 		return board;
+	}
+	
+	public String checkAttack(int row, int col) {
+		try {
+			if(this.board.ship_placement_grid[row][col] == Board.PLACEMENT_BOARD_SHIP) {
+				board.handleShipAttack(row, col);
+				return ATTACK_HIT;
+			}
+			else {
+				return ATTACK_MISS;
+			}
+		}
+		catch(Exception e) {
+			System.out.println(row + ", " + col);
+			e.printStackTrace();
+		}
+		return "FAILED";
 	}
 }
