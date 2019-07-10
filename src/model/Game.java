@@ -3,6 +3,8 @@ package model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * This class is used to hold information about the game in progress

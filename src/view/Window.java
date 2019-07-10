@@ -233,7 +233,7 @@ public class Window {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 	    gameFrame = new JFrame("BattleShip");
 	    gameFrame.setLayout(null);
-	    gameFrame.setSize(1600,900);
+	    gameFrame.setSize(1380,800);
 	    gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    gameFrame.setJMenuBar(createMenu());
 	    gameFrame.setVisible(true);
