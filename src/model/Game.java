@@ -28,57 +28,130 @@ public class Game {
 	 * @return Success or failure
 	 */
 	public static boolean checkPositions(String positions) {
-		int corr_size[] = {4,3,2,2,1};
-		ArrayList<String> prevPositions = new ArrayList<String>();
 		positions = positions.replaceAll(" ", "");
 		String[] pos = positions.split("\\(");
-		if(pos.length < 6) {
+		ArrayList<String> visitedPos = new ArrayList<>();   //Stores the co-ordinates of the ships which are placed
+		ArrayList<String> occupiedPos = new ArrayList<>();
+		
+		if(positions.split(",").length != 10) {
+			JOptionPane.showMessageDialog(new JFrame(), "All the co-ordinates not mentioned");
 			return false;
 		}
-		for(int i = 1; i < pos.length; i++) {
+			
+		for(int i = 0; i < pos.length; i++) {
 			String[] info = pos[i].split(",");
 			if(info.length < 2) {
 				continue;
 			}
 			info[1] = info[1].substring(0, info[1].length() - 1);
-
-			int row = info[0].charAt(0) - 65;
-			int col = Integer.parseInt(info[0].substring(1)) - 1;
 			
-			int row2 = info[1].charAt(0) - 65;
-			int col2 = Integer.parseInt(info[1].substring(1)) - 1;
-			
-			if(row < 0 || row2 < 0 || row > Board.BOARD_ROWS || row2 > Board.BOARD_ROWS ||
-					col < 0 || col2 < 0 || col > Board.BOARD_COLS || col > Board.BOARD_COLS) {
+			/**
+			 * Checks whether are placed inside the grid or not
+			 */
+			if((info[0].charAt(0) < 'A' || info[0].charAt(0) > 'K') || (info[0].charAt(1) < '1' || info[0].charAt(1) > '9')){
+				if((info[1].charAt(0) < 'A' || info[1].charAt(0) > 'K') || (info[1].charAt(1) < '1' || info[1].charAt(1) > '9')) {
+					return false;
+				}
 				return false;
 			}
-			else if(row == row2 && (col2 - col) == corr_size[i - 1]) {
-				for(int j = col; j <= col2; j++) {
-					String toAdd = String.valueOf(Character.valueOf((char)(row + 65))) + j;
-					if(prevPositions.contains(toAdd) == false) {
-						prevPositions.add(toAdd);
-					}
-					else {
-						return false;
-					}
-				}
-			}
-			else if(col == col2 && (row2 - row) == corr_size[i - 1]) {
-				for(int j = row; j <= row2; j++) {
-					String toAdd = String.valueOf(Character.valueOf((char)(j + 65))) + col;
-					if(prevPositions.contains(toAdd) == false) {
-						prevPositions.add(toAdd);
-					}
-					else {
-						return false;
-					}
-				}
+			int startPos=0, endPos = 0;
+			if(info[0].charAt(0)==info[1].charAt(0)) {
+				startPos = Character.getNumericValue(info[0].charAt(1));
+				endPos = Character.getNumericValue(info[1].charAt(1));
 			}
 			else {
+				startPos = info[0].charAt(0) - 64;
+				endPos = info[1].charAt(0) - 64;
+			}
+			
+			int lengthShip=-1;
+			switch(i) {
+			case 1:
+				lengthShip = 4;
+				break;
+			case 2:
+				lengthShip = 3;
+				break;
+			case 3:
+				lengthShip = 2;
+				break;
+			case 4:
+				lengthShip = 2;
+				break;
+			case 5:
+				lengthShip = 1;
+				break;
+			}
+			
+			/**
+			 * Checks whether length of ships of the input positions matches or not
+			 */
+			if(endPos - startPos != lengthShip) {
+				JOptionPane.showMessageDialog(new JFrame(), "Position for length of ships does not match");
 				return false;
 			}
+			
+			/**
+			 * Checks whether ships are overlapping or not
+			 */
+			if(!visitedPos.isEmpty()) {
+				if(visitedPos.contains(info[0]) || visitedPos.contains(info[1])) { 
+					JOptionPane.showMessageDialog(new JFrame(), "Ships overlapping each other");
+					return false;
+				}
+			}
+			
+			/**
+			 * Adding all the co-ordinates in which ships are placed for checking overlapping conditions
+			 */
+			if(info[0].charAt(0)==info[1].charAt(0)) {
+				int tempPos = Character.getNumericValue(info[0].charAt(1));
+				int stopPos = Character.getNumericValue(info[1].charAt(1));
+				while(tempPos<=stopPos) {
+					String temp = info[0].substring(0, 1);
+					temp += tempPos;
+					visitedPos.add(temp);
+					tempPos++;
+				}	
+			}
+			else {
+				int tempPos = info[0].charAt(0);
+				int stopPos = info[1].charAt(0);
+				while(tempPos<=stopPos) {
+					String temp = "";
+					char c = (char)tempPos;
+					temp += c;
+					temp += info[0].substring(1);
+					visitedPos.add(temp);
+					tempPos++;
+				}	
+			}
+			
+			/**
+			 * Checks whether the ships are placed beside each other or not
+			 */
+			if(!visitedPos.isEmpty()) {
+				for(int j=0;j<visitedPos.size();j++) {
+					String placedShip = visitedPos.get(j);
+					if(info[0].charAt(0)==info[1].charAt(0)) {
+						int placedPos = placedShip.charAt(0);
+						int currPos = info[0].charAt(0);
+						if(currPos==placedPos + 1 || currPos == placedPos - 1) {
+							JOptionPane.showMessageDialog(new JFrame(), "Ships cannot be beside each other");
+							return false;
+						}
+					}
+					else {
+						int placedPos = Character.getNumericValue(placedShip.charAt(1));
+						int currPos = Character.getNumericValue(info[1].charAt(1));
+						if(currPos == placedPos + 1 || currPos == placedPos - 1) {
+							JOptionPane.showMessageDialog(new JFrame(), "Ships cannot be beside each other");
+							return false;
+						}
+					}
+				}
+			}
 		}
-		
 		return true;
 	}
 	

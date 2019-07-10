@@ -42,14 +42,45 @@ public class Window {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
+				if(player1.isEmpty())
+					player1 = "Human";
+				
 				String positions1 = JOptionPane.showInputDialog(""
 						+ "Please input placement positions for\n"
 						+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
 						+ "Comma Separated Values\n"
-						+ "Example: (A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6): ");
+						+ "Example: (A1,A5),(C2,C5),(E3,E5),(G4,G6),(I5,I6): ");
+				String[] positions = positions1.split(",");
 				
-				while(Game.checkPositions(positions1) == false) {
-					positions1 = JOptionPane.showInputDialog("Incorrect positions. Try again: ");
+				while(positions1.isEmpty()) 
+				{
+					if(positions1.isEmpty())
+						JOptionPane.showMessageDialog(new JFrame(), "Ship placement positions cannot be empty");
+					
+					positions1 = JOptionPane.showInputDialog(""
+							+ "TRY AGAIN\n"
+							+ "Please input placement positions for\n"
+							+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
+							+ "Comma Separated Values\n"
+							+ "Example: (A1,A5),(C2,C5),(E3,E5),(G4,G6),(I5,I6): ");
+					positions = positions1.split(",");
+				}
+				
+				for(String pos:positions) 
+				{
+					pos = pos.replaceAll("[^A-Z0-9]", "");
+					int row = pos.charAt(0) - 65;
+					char col = pos.charAt(1);
+				}
+				
+				
+				while(!Game.checkPositions(positions1)) {
+					positions1 = JOptionPane.showInputDialog(""
+							+ "TRY AGAIN\n"
+							+ "Please input placement positions for\n"
+							+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
+							+ "Comma Separated Values\n"
+							+ "Example: (A1,A5),(C2,C5),(E3,E5),(G4,G6),(I5,I6): ");
 				}
 				
 				gameController = new GameController();
