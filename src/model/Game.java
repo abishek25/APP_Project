@@ -14,6 +14,8 @@ public class Game {
 	Player[] players;
 	int mode;
 	int currPlayer;
+	static boolean isFinished;
+	static String winnerName;
 	
 	public static boolean checkPositions(String positions) {
 		return true;
@@ -30,6 +32,7 @@ public class Game {
 		players[1] = new Player("AI", randomShipPositions());
 		mode = GAME_MODE_AI;
 		currPlayer = 0;
+		isFinished = false;
 	}
 	
 	public Game(String playerOneName, String player1Positions, String playerTwoName, String player2Positions) {
@@ -86,6 +89,22 @@ public class Game {
 		System.out.println("AI Attack Result For (" + row + "," + col + "): " + result);
 	}
 	
+	public void updateGameStatus(Board board) {
+		boolean rt = false;
+		int[][] grid = board.getShipPlacementGrid();
+		for(int i = 0; i < Board.BOARD_ROWS; i++) {
+			for(int j = 0; j < Board.BOARD_COLS; j++) {
+				if(grid[i][j] == Board.PLACEMENT_BOARD_SHIP) {
+					rt = true;
+					break;
+				}
+			}
+		}
+		if(rt == false) {
+			isFinished = true;
+		}
+	}
+	
 	public String processAttack(int row, int col) {
 		String result = "";
 		if(getGameMode() == GAME_MODE_AI) {
@@ -97,7 +116,17 @@ public class Game {
 			else {
 				players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
 			}
-			generateAiAttack();
+			updateGameStatus(players[1].board);
+			if(isFinished == false) {
+				generateAiAttack();
+				updateGameStatus(players[0].board);
+				if(isFinished == true) {
+					winnerName = players[1].getName();
+				}
+			}
+			else {
+				winnerName = players[0].getName();
+			}
 		}
 		else {
 			if(currPlayer == 0) {
@@ -111,5 +140,13 @@ public class Game {
 		}
 		
 		return result;
+	}
+	
+	public static String getWinner() {
+		return winnerName;
+	}
+	
+	public static boolean checkIfGameWon() {
+		return isFinished;
 	}
 }

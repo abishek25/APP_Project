@@ -1,6 +1,5 @@
 package model;
 
-import java.util.StringTokenizer;
 
 public class Player {
 	
@@ -43,7 +42,7 @@ public class Player {
 		this.board = new Board();
 		this.name = name;
 		initShips();
-		System.out.println(positions);
+
 		positions = positions.replaceAll(" ", "");
 		String[] pos = positions.split("\\(");
 		for(int i = 0; i < pos.length; i++) {
@@ -52,10 +51,9 @@ public class Player {
 				continue;
 			}
 			info[1] = info[1].substring(0, info[1].length() - 1);
-			System.out.println(info[0] + " : " + info[1]);
+
 			putShipOnBoard(info[0], info[1]);
 		}
-		
 	}
 	
 	public String getName() {

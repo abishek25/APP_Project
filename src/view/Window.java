@@ -2,10 +2,8 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -25,6 +23,8 @@ public class Window {
 	JButton[][] lblAttackGrid;
 	JLabel[][] lblShipPlacementGrid;
 	JLabel turnLabel;
+	JLabel resultLabel;
+	JLabel gameStatus;
 	
 	public JMenuItem createNewGameMenuItem() {
 		JMenuItem newGame = new JMenuItem("New Game");
@@ -54,6 +54,14 @@ public class Window {
 				turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
 				turnLabel.setBounds(0, 600, 300, 50);
 				gameFrame.add(turnLabel);
+				
+				resultLabel = new JLabel("");
+				resultLabel.setBounds(0, 680, 300, 50);
+				gameFrame.add(resultLabel);
+				
+				gameStatus = new JLabel("Game in progress");
+				gameStatus.setBounds(0, 750, 300, 50);
+				gameFrame.add(gameStatus);
 				
 				gameFrame.revalidate();
 				
@@ -117,11 +125,10 @@ public class Window {
 					f.add(lbl2);
 				}
 				else {
-					//JLabel lbl = new JLabel("-----");
 					JButton btn = new JButton(("" + (char)(65 + i)) + (j + 1));
 					lblAttackGrid[i][j] = btn;
-					lblAttackGrid[i][j].setBounds(600 + (70 * i), (70 * j), 70, 70);
-					//lblAttackGrid[i][j].setLocation(40 * i, 40 * j);
+					lblAttackGrid[i][j].setBounds(800 + (70 * i), (70 * j), 70, 70);
+
 					lblAttackGrid[i][j].addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -135,7 +142,16 @@ public class Window {
 							else {
 								lblAttackGrid[row][col].setText("MISS");
 							}
+							
 							lblAttackGrid[row][col].setEnabled(false);
+							result = "Prev Turn Result: " + result;
+							resultLabel.setText(result);
+							if(Game.checkIfGameWon() == true) {
+								gameStatus.setText("Game Over. Winner is " + Game.getWinner());
+								JOptionPane.showMessageDialog(null, Game.getWinner() + " won the game.", 
+										"Game Over", JOptionPane.INFORMATION_MESSAGE);
+								System.exit(0);
+							}
 						}
 					});
 					
@@ -156,7 +172,7 @@ public class Window {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 	    gameFrame = new JFrame("BattleShip");
 	    gameFrame.setLayout(null);
-	    gameFrame.setSize(1200,800);
+	    gameFrame.setSize(1600,900);
 	    gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    gameFrame.setJMenuBar(createMenu());
 	    gameFrame.setVisible(true);
