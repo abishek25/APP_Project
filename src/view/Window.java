@@ -41,6 +41,7 @@ public class Window {
 						+ "Example: (A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6): ");
 				
 				positions1 = "(A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6)";
+				//positions1 = "(A1,E1),(A2,D2),(A3,C3),(A4,C4),(A1,A2)";
 				
 				while(Game.checkPositions(positions1) == false) {
 					positions1 = JOptionPane.showInputDialog("Incorrect positions. Try again: ");

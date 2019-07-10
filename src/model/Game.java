@@ -18,11 +18,75 @@ public class Game {
 	static String winnerName;
 	
 	public static boolean checkPositions(String positions) {
+		int corr_size[] = {4,3,2,2,1};
+		ArrayList<String> prevPositions = new ArrayList<String>();
+		positions = positions.replaceAll(" ", "");
+		String[] pos = positions.split("\\(");
+		if(pos.length < 6) {
+			return false;
+		}
+		for(int i = 1; i < pos.length; i++) {
+			String[] info = pos[i].split(",");
+			if(info.length < 2) {
+				continue;
+			}
+			info[1] = info[1].substring(0, info[1].length() - 1);
+
+			int row = info[0].charAt(0) - 65;
+			int col = Integer.parseInt(info[0].substring(1)) - 1;
+			
+			int row2 = info[1].charAt(0) - 65;
+			int col2 = Integer.parseInt(info[1].substring(1)) - 1;
+			
+			if(row < 0 || row2 < 0 || row > Board.BOARD_ROWS || row2 > Board.BOARD_ROWS ||
+					col < 0 || col2 < 0 || col > Board.BOARD_COLS || col > Board.BOARD_COLS) {
+				return false;
+			}
+			else if(row == row2 && (col2 - col) == corr_size[i - 1]) {
+				for(int j = col; j <= col2; j++) {
+					String toAdd = String.valueOf(Character.valueOf((char)(row + 65))) + j;
+					if(prevPositions.contains(toAdd) == false) {
+						prevPositions.add(toAdd);
+					}
+					else {
+						return false;
+					}
+				}
+			}
+			else if(col == col2 && (row2 - row) == corr_size[i - 1]) {
+				for(int j = row; j <= row2; j++) {
+					String toAdd = String.valueOf(Character.valueOf((char)(j + 65))) + col;
+					if(prevPositions.contains(toAdd) == false) {
+						prevPositions.add(toAdd);
+					}
+					else {
+						return false;
+					}
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		
 		return true;
 	}
 	
 	public String randomShipPositions() {
-		String aiPositions = "(B1,B5),(D2,D5),(C3,C5),(F4,F6),(G2,G3)";
+		ArrayList<Integer> rows = new ArrayList<Integer>();
+		for(int i = 0; i < (Board.BOARD_ROWS - 5); i++) {
+			rows.add(i);
+		}
+		
+		int[] shipSizes = {4,3,2,2,1};
+		String aiPositions = "";
+		for(int i = 0; i < shipSizes.length; i++) {
+			Collections.shuffle(rows);
+			int row = rows.remove(0);
+			int col = rand.nextInt(Board.BOARD_COLS - shipSizes[i]) + 1;
+			aiPositions = aiPositions + "(" + ((char)(row + 65)) + col + "," + ((char)(row + 65)) + (col + shipSizes[i]) + "),";
+		}
+		aiPositions = aiPositions.substring(0, aiPositions.length() - 1);
 		return aiPositions;
 	}
 	

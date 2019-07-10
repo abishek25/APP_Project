@@ -32,8 +32,8 @@ public class Player {
 			}
 		}
 		else if(col == col2) {
-			for(int i = col; i <= col2; i++) {
-				board.ship_placement_grid[row][i] = Board.PLACEMENT_BOARD_SHIP;
+			for(int i = row; i <= row2; i++) {
+				board.ship_placement_grid[i][col] = Board.PLACEMENT_BOARD_SHIP;
 			}
 		}
 	}
