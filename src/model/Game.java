@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+/**
+ * This class is used to hold information about the game in progress
+ *
+ */
 public class Game {
 	
 	public static int GAME_MODE_AI = 1;
 	public static int GAME_MODE_NETWORK = 2;
 	public static int GAME_MODE_INVALID = 3;
+	
 	public static Random rand = new Random();
 	
 	Player[] players;
@@ -17,6 +22,11 @@ public class Game {
 	static boolean isFinished;
 	static String winnerName;
 	
+	/**
+	 * This function checks positions passed for placement of ship
+	 * @param positions of ship
+	 * @return Success or failure
+	 */
 	public static boolean checkPositions(String positions) {
 		int corr_size[] = {4,3,2,2,1};
 		ArrayList<String> prevPositions = new ArrayList<String>();
@@ -72,6 +82,10 @@ public class Game {
 		return true;
 	}
 	
+	/**
+	 * This function generates random placement of ships for the AI engine
+	 * @return The positions as string
+	 */
 	public String randomShipPositions() {
 		ArrayList<Integer> rows = new ArrayList<Integer>();
 		for(int i = 0; i < (Board.BOARD_ROWS - 5); i++) {
@@ -90,6 +104,11 @@ public class Game {
 		return aiPositions;
 	}
 	
+	/**
+	 * The consutructor to get information about the players playing the game
+	 * @param playerOneName The player name
+	 * @param player1Positions The player positions
+	 */
 	public Game(String playerOneName, String player1Positions) {
 		players = new Player[2];
 		players[0] = new Player(playerOneName, player1Positions);
@@ -99,6 +118,13 @@ public class Game {
 		isFinished = false;
 	}
 	
+	/**
+	 * Constructor to get information about two players
+	 * @param playerOneName Player 1 name
+	 * @param player1Positions Player 1 positions
+	 * @param playerTwoName Player 2 name
+	 * @param player2Positions Player 2 positions
+	 */
 	public Game(String playerOneName, String player1Positions, String playerTwoName, String player2Positions) {
 		players = new Player[2];
 		players[0] = new Player(playerOneName, player1Positions);
@@ -107,14 +133,26 @@ public class Game {
 		currPlayer = 0;
 	}
 	
+	/**
+	 * Function to get game mode
+	 * @return The game mode
+	 */
 	public int getGameMode() {
 		return mode;
 	}
 	
+	/**
+	 * Function to get game board
+	 * @return The game board
+	 */
 	public Board getGameBoard() {
 		return players[currPlayer].getBoard();
 	}
 	
+	/**
+	 * Function to get ai board
+	 * @return The game board of AI
+	 */
 	public Board getAiBoard() {
 		if(mode == GAME_MODE_AI) {
 			return players[1].getBoard();
@@ -122,10 +160,17 @@ public class Game {
 		return null;
 	}
 	
+	/**
+	 * Function to get current player
+	 * @return The current player
+	 */
 	public Player getCurrPlayer() {
 		return this.players[currPlayer];
 	}
 	
+	/**
+	 * Function to generate ai attack
+	 */
 	public void generateAiAttack() {
 		ArrayList<String> possiblepairs = new ArrayList<String>();
 		
@@ -153,6 +198,10 @@ public class Game {
 		System.out.println("AI Attack Result For (" + row + "," + col + "): " + result);
 	}
 	
+	/**
+	 * Function to update game status
+	 * @param board The new game status after attack
+	 */
 	public void updateGameStatus(Board board) {
 		boolean rt = false;
 		int[][] grid = board.getShipPlacementGrid();
@@ -169,6 +218,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Function to process attack
+	 * @param row The input row
+	 * @param col The input column
+	 * @return The result of attack
+	 */
 	public String processAttack(int row, int col) {
 		String result = "";
 		if(getGameMode() == GAME_MODE_AI) {
@@ -206,10 +261,18 @@ public class Game {
 		return result;
 	}
 	
+	/**
+	 * Function to get winner
+	 * @return The winner name
+	 */
 	public static String getWinner() {
 		return winnerName;
 	}
 	
+	/**
+	 * Function to get game status
+	 * @return Game status
+	 */
 	public static boolean checkIfGameWon() {
 		return isFinished;
 	}

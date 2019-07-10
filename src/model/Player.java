@@ -1,6 +1,9 @@
 package model;
 
-
+/**
+ * This class is used to hold information about the player
+ *
+ */
 public class Player {
 	
 	public static String ATTACK_HIT = "Attack was success";
@@ -10,6 +13,9 @@ public class Player {
 	Ship[] ships;
 	Board board;
 	
+	/**
+	 * Function to initialize the ships
+	 */
 	public void initShips() {
 		ships = new Ship[5];
 		ships[0] = new Ship("Carrier", 5);
@@ -19,6 +25,11 @@ public class Player {
 		ships[4] = new Ship("Destroyer", 2);
 	}
 	
+	/**
+	 * Place the ships on the placement board
+	 * @param start The start position of ship
+	 * @param end The end position of ship
+	 */
 	public void putShipOnBoard(String start, String end) {
 		int row = start.charAt(0) - 65;
 		int col = Integer.parseInt(start.substring(1)) - 1;
@@ -38,6 +49,11 @@ public class Player {
 		}
 	}
 	
+	/**
+	 * Constructor to get information about player
+	 * @param name The player name
+	 * @param positions The player positions
+	 */
 	public Player(String name, String positions) {
 		this.board = new Board();
 		this.name = name;
@@ -56,14 +72,28 @@ public class Player {
 		}
 	}
 	
+	/**
+	 * Function to get player name
+	 * @return Player name
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/**
+	 * Function to get game baord
+	 * @return The game board
+	 */
 	public Board getBoard() {
 		return board;
 	}
 	
+	/**
+	 * Function to check attack
+	 * @param row The attack row
+	 * @param col The attack column
+	 * @return The attack result
+	 */
 	public String checkAttack(int row, int col) {
 		try {
 			if(this.board.ship_placement_grid[row][col] == Board.PLACEMENT_BOARD_SHIP) {

@@ -16,6 +16,10 @@ import model.Board;
 import model.Game;
 import model.Player;
 
+/**
+ * The class is used to implement the user interface
+ *
+ */
 public class Window {
 	
 	JFrame gameFrame; 
@@ -26,6 +30,10 @@ public class Window {
 	JLabel resultLabel;
 	JLabel gameStatus;
 	
+	/**
+	 * Function to create the file's new game menu item
+	 * @return The menu item
+	 */
 	public JMenuItem createNewGameMenuItem() {
 		JMenuItem newGame = new JMenuItem("New Game");
 		
@@ -39,9 +47,6 @@ public class Window {
 						+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
 						+ "Comma Separated Values\n"
 						+ "Example: (A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6): ");
-				
-				//positions1 = "(A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6)";
-				//positions1 = "(A1,E1),(A2,D2),(A3,C3),(A4,C4),(A1,A2)";
 				
 				while(Game.checkPositions(positions1) == false) {
 					positions1 = JOptionPane.showInputDialog("Incorrect positions. Try again: ");
@@ -72,18 +77,29 @@ public class Window {
 		return newGame;
 	}
 	
+	/**
+	 * Function to create file menu
+	 * @return The File menu
+	 */
 	public JMenu createFileMenu() {
 		JMenu file = new JMenu("File");
 		file.add(createNewGameMenuItem());
 		return file;
 	}
 	
+	/**
+	 * Function to create menu bar
+	 * @return The menu bar
+	 */
 	public JMenuBar createMenu() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		return menuBar;
 	}
 	
+	/**
+	 * Function to refresh the board display
+	 */
 	public void refreshBoard() {
 		Board board = gameController.getGame().getGameBoard();
 		int[][] shipPlacementGrid = board.getShipPlacementGrid();
@@ -103,12 +119,22 @@ public class Window {
 		}
 	}
 	
+	/**
+	 * Function to process the attack command
+	 * @param row The row to attack
+	 * @param col The column to attack
+	 * @return The attack result
+	 */
 	public String processCommand(int row, int col) {
 		String result = gameController.processAttack(row, col);
 		refreshBoard();
 		return result;
 	}
 
+	/**
+	 * Function to create the board display
+	 * @param f The game frame
+	 */
 	public void createBoardDisplay(JFrame f) {
 		lblAttackGrid = new JButton[Board.BOARD_ROWS][Board.BOARD_COLS];
 		lblShipPlacementGrid = new JLabel[Board.BOARD_ROWS][Board.BOARD_COLS];
@@ -169,6 +195,9 @@ public class Window {
 		refreshBoard();
 	}
 
+	/**
+	 * Function to initialize java frame
+	 */
 	public void initMainFrame() {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 	    gameFrame = new JFrame("BattleShip");
@@ -179,10 +208,17 @@ public class Window {
 	    gameFrame.setVisible(true);
 	}
 	
+	/**
+	 * Function to start everything
+	 */
 	public void start() {
 		initMainFrame();
 	}
 	
+	/**
+	 * The main function called by OS
+	 * @param args The command line argumeents
+	 */
 	public static void main(String[] args) {
 		Window win = new Window();
 		win.start();
