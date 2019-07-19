@@ -7,6 +7,10 @@ package model;
 public class Ship {
 	String name;
 	boolean holes[];
+	int length;
+	public boolean isHorizontal;
+	
+	int x; int y;
 	
 	/**
 	 * Function to initialize the ship holes
@@ -56,5 +60,24 @@ public class Ship {
 	public Ship(String name, int numHoles) {
 		this.name = name;
 		this.initHoles(numHoles);
+	}
+	
+	public Ship() {
+		this.x = 0;
+		this.y = 0;
+		isHorizontal = true;	
+	}
+	
+	public void setLength(int l) {
+		this.length = l;
+	}
+	
+	public int getLength() {
+		return this.length;
+	}
+	
+	public void addPosition(int x,int y) {
+		this.x = x;
+		this.y = y;
 	}
 }
