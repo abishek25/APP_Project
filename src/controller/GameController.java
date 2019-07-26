@@ -11,14 +11,24 @@ import model.Player;
 public class GameController {
 	
 	Game game;
+	int gameMode;
+	
+	/**
+	 * The constructor to assign game mode
+	 * @param gameMode The game mode
+	 */
+	public GameController(int gameMode) {
+		this.gameMode = gameMode;
+	}
 	
 	/**
 	 * Function to create game
 	 * @param player1Name The player 1 name
 	 * @param positions1 The player 1 positions
+	 * @param player1 ships
 	 */
-	public void createGame(String player1Name, Board board) {
-		game = new Game(player1Name, board);
+	public void createGame(String player1Name, Board board, String[] playerShips) {
+		game = new Game(player1Name, board, gameMode, playerShips);
 	}
 	
 	/**

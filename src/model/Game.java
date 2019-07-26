@@ -14,10 +14,17 @@ public class Game {
 	public static int GAME_MODE_NETWORK = 2;
 	public static int GAME_MODE_INVALID = 3;
 	
+	public static int GAME_TYPE_REGULAR = 1;
+	public static int GAME_TYPE_SALVA = 2;
+	
 	public static Random rand = new Random();
 	
 	Player[] players;
 	int mode;
+	int gameMode;
+	
+	public static ArrayList<String> salvaAttackRes;
+	
 	int currPlayer;
 	static boolean isFinished;
 	static String winnerName;
@@ -112,12 +119,15 @@ public class Game {
 	 * The consutructor to get information about the players playing the game
 	 * @param playerOneName The player name
 	 * @param player1Positions The player positions
+	 * @param gameMode The game mode
+	 * @param playerShips The player's ships
 	 */
-	public Game(String playerOneName, Board board) {
+	public Game(String playerOneName, Board board, int gameMode, String[] playerShips) {
 		players = new Player[2];
-		players[0] = new Player(playerOneName, board);
+		players[0] = new Player(playerOneName, board, playerShips);
 		players[1] = new Player("AI", randomShipPositions());
 		mode = GAME_MODE_AI;
+		this.gameMode = gameMode;
 		currPlayer = 0;
 		isFinished = false;
 	}
@@ -264,24 +274,40 @@ public class Game {
 	public String processAttack(int row, int col) {
 		String result = "";
 		if(getGameMode() == GAME_MODE_AI) {
-			result = players[1].checkAttack(row, col);
-			System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
-			if(result.equals(Player.ATTACK_HIT)) {
-				players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
-			}
-			else {
-				players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
-			}
-			updateGameStatus(players[1].board);
-			if(isFinished == false) {
-				generateAiAttack();
-				updateGameStatus(players[0].board);
-				if(isFinished == true) {
-					winnerName = players[1].getName();
+			if(this.gameMode == Game.GAME_TYPE_REGULAR) {
+				result = players[1].checkAttack(row, col);
+				System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
+				if(result.equals(Player.ATTACK_HIT)) {
+					players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+				}
+				else {
+					players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+				}
+				updateGameStatus(players[1].board);
+				if(isFinished == false) {
+					generateAiAttack();
+					updateGameStatus(players[0].board);
+					if(isFinished == true) {
+						winnerName = players[1].getName();
+					}
+				}
+				else {
+					winnerName = players[0].getName();
 				}
 			}
-			else {
-				winnerName = players[0].getName();
+			else if(this.gameMode == Game.GAME_TYPE_SALVA) {
+				result = players[1].checkAttack(row, col);
+				salvaAttackRes.add(result);
+				if(salvaAttackRes.size() == 5) {
+					System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
+					if(result.equals(Player.ATTACK_HIT)) {
+						players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+					}
+					else {
+						players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+					}
+					updateGameStatus(players[1].board);
+				}
 			}
 		}
 		else {

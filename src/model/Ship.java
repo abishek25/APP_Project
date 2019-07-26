@@ -7,6 +7,7 @@ package model;
 public class Ship {
 	String name;
 	boolean holes[];
+	public String unfilledHoles[];
 	
 	/**
 	 * Function to initialize the ship holes
@@ -56,5 +57,6 @@ public class Ship {
 	public Ship(String name, int numHoles) {
 		this.name = name;
 		this.initHoles(numHoles);
+		this.unfilledHoles = new String[numHoles];
 	}
 }

@@ -29,8 +29,9 @@ public class Player {
 	 * Place the ships on the placement board
 	 * @param start The start position of ship
 	 * @param end The end position of ship
+	 * @param shipCtr The ship counter
 	 */
-	public void putShipOnBoard(String start, String end) {
+	public void putShipOnBoard(String start, String end, int shipCtr) {
 		int row = start.charAt(0) - 65;
 		int col = Integer.parseInt(start.substring(1)) - 1;
 		
@@ -38,13 +39,16 @@ public class Player {
 		int col2 = Integer.parseInt(end.substring(1)) - 1;
 		
 		if(row == row2) {
+			int ctr = 0;
 			for(int i = col; i <= col2; i++) {
 				board.ship_placement_grid[row][i] = Board.PLACEMENT_BOARD_SHIP;
+				ships[shipCtr].unfilledHoles[ctr++] = row + "" + i + ",";
 			}
 		}
 		else if(col == col2) {
 			for(int i = row; i <= row2; i++) {
 				board.ship_placement_grid[i][col] = Board.PLACEMENT_BOARD_SHIP;
+				ships[shipCtr].unfilledHoles[i] = i + "" + col + ",";
 			}
 		}
 	}
@@ -61,6 +65,7 @@ public class Player {
 
 		positions = positions.replaceAll(" ", "");
 		String[] pos = positions.split("\\(");
+		int k = 0;
 		for(int i = 0; i < pos.length; i++) {
 			String[] info = pos[i].split(",");
 			if(info.length < 2) {
@@ -68,13 +73,42 @@ public class Player {
 			}
 			info[1] = info[1].substring(0, info[1].length() - 1);
 
-			putShipOnBoard(info[0], info[1]);
+			putShipOnBoard(info[0], info[1], k);
+			k++;
+		}
+		
+		for(int i = 0; i < 5; i++) {
+			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+				System.out.print(ships[i].unfilledHoles[j]);
+			}
+			System.out.println();
 		}
 	}
 	
-	public Player(String name, Board board) {
+	public Player(String name, Board board, String[] playerShips) {
 		this.board = board;
 		this.name = name;
+		
+		ships = new Ship[5];
+		ships[0] = new Ship("Carrier", 5);
+		ships[1] = new Ship("Battleship", 4);
+		ships[2] = new Ship("Cruiser", 3);
+		ships[3] = new Ship("Submarine", 3);
+		ships[4] = new Ship("Destroyer", 2);
+		
+		for(int i = 0; i < 5; i++) {
+			String[] pos = playerShips[i].split(",");
+			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+				ships[i].unfilledHoles[j] = pos[j];
+			}
+		}
+		
+		for(int i = 0; i < 5; i++) {
+			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+				System.out.print(ships[i].unfilledHoles[j] + ",");
+			}
+			System.out.println();
+		}
 	}
 	
 	/**
