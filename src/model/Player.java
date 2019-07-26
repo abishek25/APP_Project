@@ -12,6 +12,7 @@ public class Player {
 	String name;
 	Ship[] ships;
 	Board board;
+	int numShipsAlive;
 	
 	/**
 	 * Function to initialize the ships
@@ -76,13 +77,7 @@ public class Player {
 			putShipOnBoard(info[0], info[1], k);
 			k++;
 		}
-		
-		for(int i = 0; i < 5; i++) {
-			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
-				System.out.print(ships[i].unfilledHoles[j]);
-			}
-			System.out.println();
-		}
+		numShipsAlive = 5;
 	}
 	
 	public Player(String name, Board board, String[] playerShips) {
@@ -103,12 +98,7 @@ public class Player {
 			}
 		}
 		
-		for(int i = 0; i < 5; i++) {
-			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
-				System.out.print(ships[i].unfilledHoles[j] + ",");
-			}
-			System.out.println();
-		}
+		numShipsAlive = 5;
 	}
 	
 	/**
@@ -127,6 +117,34 @@ public class Player {
 		return board;
 	}
 	
+	public void checkShips(int row, int col) {
+		
+		for(int i = 0; i < ships.length; i++) {
+			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+				if(ships[i].unfilledHoles[j] == null) {
+					continue;
+				}
+				if(ships[i].unfilledHoles[j].equals(row + "" + col)) {
+					ships[i].unfilledHoles[j] = null;
+				}
+			}
+		}
+		
+		this.numShipsAlive = 5;
+		for(int i = 0; i < ships.length; i++) {
+			boolean sunk = true;
+			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+				if(ships[i].unfilledHoles[j] != null) {
+					sunk = false;
+				}
+			}
+			if(sunk == true) {
+				numShipsAlive--;
+			}
+		}
+		System.out.println("Ships Alive: " + numShipsAlive);
+	}
+	
 	/**
 	 * Function to check attack
 	 * @param row The attack row
@@ -137,6 +155,7 @@ public class Player {
 		try {
 			if(this.board.ship_placement_grid[row][col] == Board.PLACEMENT_BOARD_SHIP) {
 				board.handleShipAttack(row, col);
+				checkShips(row, col);
 				return ATTACK_HIT;
 			}
 			else {

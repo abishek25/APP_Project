@@ -192,11 +192,34 @@ public class Window {
 							int row = cmd.charAt(0) - 65;
 							int col = Integer.parseInt(cmd.substring(1)) - 1;
 							String result = processCommand(row, col);
-							if(result.equals(Player.ATTACK_HIT)) {
-								lblAttackGrid[row][col].setText("*HIT");
+							if(Game.gameMode == Game.GAME_TYPE_REGULAR) {
+								if(result.equals(Player.ATTACK_HIT)) {
+									lblAttackGrid[row][col].setText("*HIT");
+								}
+								else {
+									lblAttackGrid[row][col].setText("MISS");
+								}
 							}
 							else {
-								lblAttackGrid[row][col].setText("MISS");
+								if(result.equals("Turn in process")) {
+									lblAttackGrid[row][col].setText("WAIT");
+								}
+								else {
+									String resuts[] = result.split(" ");
+									System.out.println(resuts);
+									for(int i = 0; i < resuts.length; i++) {
+										System.out.println(resuts[i]);
+										String info[] = resuts[i].split("#");
+										int trow = Integer.parseInt(info[0]);
+										int tcol = Integer.parseInt(info[1]);
+										if(info[2].equals("missed")) {
+											lblAttackGrid[trow][tcol].setText("MISS");
+										}
+										else {
+											lblAttackGrid[trow][tcol].setText("*HIT");
+										}
+									}
+								}
 							}
 							
 							lblAttackGrid[row][col].setEnabled(false);

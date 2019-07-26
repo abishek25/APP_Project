@@ -21,7 +21,7 @@ public class Game {
 	
 	Player[] players;
 	int mode;
-	int gameMode;
+	public static int gameMode;
 	
 	public static ArrayList<String> salvaAttackRes;
 	
@@ -130,6 +130,7 @@ public class Game {
 		this.gameMode = gameMode;
 		currPlayer = 0;
 		isFinished = false;
+		salvaAttackRes = new ArrayList<String>();
 	}
 	
 	/**
@@ -145,6 +146,7 @@ public class Game {
 		players[1] = new Player(playerTwoName, player2Positions);
 		mode = GAME_MODE_NETWORK;
 		currPlayer = 0;
+		salvaAttackRes = new ArrayList<String>();
 	}
 	
 	/**
@@ -297,16 +299,40 @@ public class Game {
 			}
 			else if(this.gameMode == Game.GAME_TYPE_SALVA) {
 				result = players[1].checkAttack(row, col);
-				salvaAttackRes.add(result);
-				if(salvaAttackRes.size() == 5) {
-					System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
-					if(result.equals(Player.ATTACK_HIT)) {
-						players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+				if(result.equals(Player.ATTACK_HIT)) {
+					players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+				}
+				else {
+					players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+				}
+				
+				salvaAttackRes.add(row + "#" + col + "#" + result.substring(11));
+				if(salvaAttackRes.size() == players[0].numShipsAlive) {
+					String results = "";
+					
+					for(int i = 0; i < players[0].numShipsAlive; i++) {
+						results += salvaAttackRes.get(i) + " ";
+					}
+					salvaAttackRes.clear();
+					updateGameStatus(players[1].board);
+					
+					if(isFinished == false) {
+						for(int i = 0; i < players[1].numShipsAlive; i++) {
+							generateAiAttack();
+						}
+						updateGameStatus(players[0].board);
+						if(isFinished == true) {
+							winnerName = players[1].getName();
+						}
 					}
 					else {
-						players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+						winnerName = players[0].getName();
 					}
-					updateGameStatus(players[1].board);
+					
+					return results;
+				}
+				else {
+					return "Turn in process";
 				}
 			}
 		}
