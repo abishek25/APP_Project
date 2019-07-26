@@ -72,6 +72,11 @@ public class Player {
 		}
 	}
 	
+	public Player(String name, Board board) {
+		this.board = board;
+		this.name = name;
+	}
+	
 	/**
 	 * Function to get player name
 	 * @return Player name

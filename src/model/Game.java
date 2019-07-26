@@ -22,6 +22,10 @@ public class Game {
 	static boolean isFinished;
 	static String winnerName;
 	
+	static int prevAIAttackResult;
+	static int prevAIAttackRow;
+	static int prevAIAttackCol;
+	
 	/**
 	 * This function checks positions passed for placement of ship
 	 * @param positions of ship
@@ -109,9 +113,9 @@ public class Game {
 	 * @param playerOneName The player name
 	 * @param player1Positions The player positions
 	 */
-	public Game(String playerOneName, String player1Positions) {
+	public Game(String playerOneName, Board board) {
 		players = new Player[2];
-		players[0] = new Player(playerOneName, player1Positions);
+		players[0] = new Player(playerOneName, board);
 		players[1] = new Player("AI", randomShipPositions());
 		mode = GAME_MODE_AI;
 		currPlayer = 0;
@@ -173,11 +177,38 @@ public class Game {
 	 */
 	public void generateAiAttack() {
 		ArrayList<String> possiblepairs = new ArrayList<String>();
+		int i1 = 0;
+		int j1 = 0;
 		
-		for(int i = 0; i < Board.BOARD_ROWS; i++) {
-			for(int j = 0; j < Board.BOARD_COLS; j++) {
-				if(players[1].board.attack_grid[i][j] == Board.BOARD_EMPTY) {
-					possiblepairs.add(String.valueOf(i) + "," + String.valueOf(j));
+		if(prevAIAttackResult == 1) {
+			if(prevAIAttackCol < (Board.BOARD_COLS - 1)) {
+				i1 = prevAIAttackRow;
+				j1 = prevAIAttackCol + 1;
+			}
+			else if(prevAIAttackCol > 0) {
+				i1 = prevAIAttackRow;
+				j1 = prevAIAttackCol - 1;
+			}
+			else if(prevAIAttackRow < (Board.BOARD_ROWS - 1)) {
+				i1 = prevAIAttackRow + 1;
+				j1 = prevAIAttackCol;
+			}
+			else if(prevAIAttackRow > 0) {
+				i1 = prevAIAttackRow - 1;
+				j1 = prevAIAttackCol;
+			}
+			
+			if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
+				possiblepairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+			}
+		}
+		
+		if(possiblepairs.size() == 0) {
+			for(int i = 0; i < Board.BOARD_ROWS; i++) {
+				for(int j = 0; j < Board.BOARD_COLS; j++) {
+					if(players[1].board.attack_grid[i][j] == Board.BOARD_EMPTY) {
+						possiblepairs.add(String.valueOf(i) + "," + String.valueOf(j));
+					}
 				}
 			}
 		}
@@ -188,13 +219,19 @@ public class Game {
 		String result = players[0].checkAttack(row, col);
 		if(result.equals(Player.ATTACK_HIT)) {
 			players[1].board.attack_grid[row][col] = Board.BOARD_HIT;
+			prevAIAttackResult = 1;
 		}
 		else if(result.equals(Player.ATTACK_MISS)){
 			players[1].board.attack_grid[row][col] = Board.BOARD_MISS;
+			prevAIAttackResult = -1;
 		}
 		else {
 			//
 		}
+		
+		prevAIAttackRow = row;
+		prevAIAttackCol = col;
+		
 		System.out.println("AI Attack Result For (" + row + "," + col + "): " + result);
 	}
 	

@@ -1,5 +1,6 @@
 package controller;
 
+import model.Board;
 import model.Game;
 import model.Player;
 
@@ -16,8 +17,8 @@ public class GameController {
 	 * @param player1Name The player 1 name
 	 * @param positions1 The player 1 positions
 	 */
-	public void createGame(String player1Name, String positions1) {
-		game = new Game(player1Name, positions1);
+	public void createGame(String player1Name, Board board) {
+		game = new Game(player1Name, board);
 	}
 	
 	/**

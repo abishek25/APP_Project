@@ -43,6 +43,11 @@ public class Window {
 	JLabel placeShip5;
 	JLabel toMoveShip;
 	
+	int numShipsPlaced = 0;
+	
+	String tmpPlayerName;
+	Board board;
+	
 	/**
 	 * Function to create the file's new game menu item
 	 * @return The menu item
@@ -68,31 +73,33 @@ public class Window {
 				}
 				*/
 				
-				String positions1 = "";
-				
 				gameController = new GameController();
-				gameController.createGame(player1, positions1);
-				
 				createBoardDisplay(gameFrame);
-				
-				turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
-				turnLabel.setBounds(0, 600, 300, 50);
-				gameFrame.add(turnLabel);
-				
-				resultLabel = new JLabel("");
-				resultLabel.setBounds(0, 680, 300, 50);
-				gameFrame.add(resultLabel);
-				
-				gameStatus = new JLabel("Game in progress");
-				gameStatus.setBounds(0, 750, 300, 50);
-				gameFrame.add(gameStatus);
-				
+				tmpPlayerName = player1;
 				gameFrame.revalidate();
-				
 			}
 		});
 		
 		return newGame;
+	}
+	
+	public void createGameAndPlayer(Board board) {
+		gameController.createGame(tmpPlayerName, board);
+		
+		turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
+		turnLabel.setBounds(0, 600, 300, 50);
+		gameFrame.add(turnLabel);
+		
+		resultLabel = new JLabel("");
+		resultLabel.setBounds(0, 680, 300, 50);
+		gameFrame.add(resultLabel);
+		
+		gameStatus = new JLabel("Game in progress");
+		gameStatus.setBounds(0, 750, 300, 50);
+		gameFrame.add(gameStatus);
+		
+		gameFrame.revalidate();
+		refreshBoard();
 	}
 	
 	/**
@@ -154,6 +161,8 @@ public class Window {
 	 * @param f The game frame
 	 */
 	public void createBoardDisplay(JFrame f) {
+		board = new Board();
+		
 		lblAttackGrid = new JButton[Board.BOARD_ROWS][Board.BOARD_COLS];
 		lblShipPlacementGrid = new JLabel[Board.BOARD_ROWS][Board.BOARD_COLS];
 		
@@ -234,7 +243,6 @@ public class Window {
 		f.add(placeShip4);
 		f.add(placeShip5);
 		
-		refreshBoard();
 	}
 
 	/**
@@ -321,7 +329,11 @@ public class Window {
 								if(place == true) {
 									for(int k = i; k < (i + 5); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
+										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
 									}
+									toMoveShip.setText("");
+									toMoveShip.disable();
+									numShipsPlaced++;
 								}
 							}
 						}
@@ -341,7 +353,11 @@ public class Window {
 								if(place == true) {
 									for(int k = i; k < (i + 4); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
+										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
 									}
+									toMoveShip.setText("");
+									toMoveShip.disable();
+									numShipsPlaced++;
 								}
 							}
 						}
@@ -361,7 +377,11 @@ public class Window {
 								if(place == true) {
 									for(int k = i; k < (i + 3); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
+										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
 									}
+									toMoveShip.setText("");
+									toMoveShip.disable();
+									numShipsPlaced++;
 								}
 							}
 						}
@@ -381,7 +401,11 @@ public class Window {
 								if(place == true) {
 									for(int k = i; k < (i + 2); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
+										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
 									}
+									toMoveShip.setText("");
+									toMoveShip.disable();
+									numShipsPlaced++;
 								}
 							}
 						}
@@ -389,8 +413,14 @@ public class Window {
 				}
 			}
 			
-			toMoveShip.setBounds(targetx, targety, 200, 10);
+			// toMoveShip.setBounds(targetx, targety, 200, 10);
 			toMoveShip = null;
+			
+			System.out.println("Number of Ships placed: " + numShipsPlaced);
+			if(numShipsPlaced == 5) {
+				System.out.println("All Ships placed. Game starts now");
+				createGameAndPlayer(board);
+			}
 		}
 		
 		@Override

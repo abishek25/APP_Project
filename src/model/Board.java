@@ -18,7 +18,7 @@ public class Board {
 	public static int BOARD_COLS = 9;
 	
 	int attack_grid[][];
-	int ship_placement_grid[][];
+	public int ship_placement_grid[][];
 	
 	/**
 	 * The function to initialize the ship placements
