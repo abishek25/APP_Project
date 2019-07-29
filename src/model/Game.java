@@ -327,7 +327,7 @@ public class Game {
 					winnerName = players[0].getName();
 				}
 			}
-			else if(this.gameMode == Game.GAME_TYPE_SALVA) {
+			else if(Game.gameMode == Game.GAME_TYPE_SALVA) {
 				result = players[1].checkAttack(row, col);
 				if(result.equals(Player.ATTACK_HIT)) {
 					players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
@@ -335,7 +335,9 @@ public class Game {
 						if(playerTurnTimer <= TURN_TIMER_MAX) {
 							playerOneScore++;
 						}
-						playerOneScore = 0;
+						synchronized (playerTurnTimer) {
+							playerTurnTimer = 0;
+						}
 					}
 				}
 				else {
@@ -344,7 +346,9 @@ public class Game {
 						if(playerTurnTimer > TURN_TIMER_MAX) {
 							playerOneScore--;
 						}
-						playerOneScore = 0;
+						synchronized (playerTurnTimer) {
+							playerTurnTimer = 0;
+						}
 					}
 				}
 				
