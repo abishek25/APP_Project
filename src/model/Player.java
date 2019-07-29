@@ -10,7 +10,7 @@ public class Player {
 	public static String ATTACK_MISS = "Attack was missed";
 	
 	String name;
-	Ship[] ships;
+	public Ship[] ships;
 	Board board;
 	int numShipsAlive;
 	
@@ -80,6 +80,12 @@ public class Player {
 		numShipsAlive = 5;
 	}
 	
+	/**
+	 * Constructor with ships
+	 * @param name Name of player
+	 * @param board Game board
+	 * @param playerShips Player's ships
+	 */
 	public Player(String name, Board board, String[] playerShips) {
 		this.board = board;
 		this.name = name;
@@ -117,6 +123,11 @@ public class Player {
 		return board;
 	}
 	
+	/**
+	 * Function to checks ships
+	 * @param row Ship row
+	 * @param col Ship column
+	 */
 	public void checkShips(int row, int col) {
 		
 		for(int i = 0; i < ships.length; i++) {

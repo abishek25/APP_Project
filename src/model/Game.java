@@ -39,6 +39,7 @@ public class Game {
 	int playerOneScore;
 	int playerTwoScore;
 	
+	public static String gameScores;
 	
 	/**
 	 * This function checks positions passed for placement of ship
@@ -313,12 +314,14 @@ public class Game {
 					}
 				}
 				updateGameStatus(players[1].board);
+				gameScores = "Scores: 1) " + players[0].name + "(" + playerOneScore + ")" + " 2) AI (" + playerTwoScore + ")";
 				if(isFinished == false) {
 					generateAiAttack();
 					synchronized (playerTurnTimer) {
 						playerTurnTimer = 0;
 					}
 					updateGameStatus(players[0].board);
+					gameScores = "Scores: 1) " + players[0].name + "(" + playerOneScore + ")" + " 2) AI (" + playerTwoScore + ")";
 					if(isFinished == true) {
 						winnerName = players[1].getName();
 					}
@@ -361,6 +364,7 @@ public class Game {
 					}
 					salvaAttackRes.clear();
 					updateGameStatus(players[1].board);
+					gameScores = "Scores: 1) " + players[0].name + "(" + playerOneScore + ")" + " 2) AI (" + playerTwoScore + ")";
 					
 					if(isFinished == false) {
 						for(int i = 0; i < players[1].numShipsAlive; i++) {
@@ -370,6 +374,7 @@ public class Game {
 							playerTurnTimer = 0;
 						}
 						updateGameStatus(players[0].board);
+						gameScores = "Scores: 1) " + players[0].name + "(" + playerOneScore + ")" + " 2) AI (" + playerTwoScore + ")";
 						if(isFinished == true) {
 							winnerName = players[1].getName();
 						}
@@ -415,7 +420,9 @@ public class Game {
 		return isFinished;
 	}
 	
-	
+	/**
+	 * The thread to keep track of turn time
+	 */
 	public Thread timer = new Thread() {
 		public void run() {
 			while(true) {
@@ -436,10 +443,18 @@ public class Game {
 		}
 	};
 	
+	/**
+	 * Function to get player one score
+	 * @return Player one scores
+	 */
 	public int getPlayerOneResults() {
 		return playerOneScore;
 	}
 	
+	/**
+	 * Function to get player two score
+	 * @return Player two scores
+	 */
 	public int getPlayerTwoResults() {
 		return playerTwoScore;
 	}

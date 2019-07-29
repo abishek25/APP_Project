@@ -11,7 +11,7 @@ import model.Player;
 public class GameController {
 	
 	Game game;
-	int gameMode;
+	public int gameMode;
 	
 	/**
 	 * The constructor to assign game mode
@@ -57,10 +57,18 @@ public class GameController {
 		return game.processAttack(row, col);
 	}
 	
+	/**
+	 * Function get player 1 score
+	 * @return Player 1 score
+	 */
 	public int getP1Score() {
 		return game.getPlayerOneResults();
 	}
 	
+	/**
+	 * Function get player 2 score
+	 * @return Player 2 score
+	 */
 	public int getAIScore() {
 		return game.getPlayerTwoResults();
 	}

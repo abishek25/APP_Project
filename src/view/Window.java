@@ -34,6 +34,7 @@ public class Window {
 	JLabel[][] lblShipPlacementGrid;
 	JLabel turnLabel;
 	JLabel resultLabel;
+	JLabel scores;
 	JLabel gameStatus;
 	
 	JLabel placeShip1;
@@ -47,7 +48,7 @@ public class Window {
 	
 	String tmpPlayerName;
 	Board board;
-	String[] playerShips;
+	public String[] playerShips;
 	
 	/**
 	 * Function to create the file's new game menu item
@@ -78,6 +79,10 @@ public class Window {
 		return newGame;
 	}
 	
+	/**
+	 * Function to create game and player
+	 * @param board The game board
+	 */
 	public void createGameAndPlayer(Board board) {
 		gameController.createGame(tmpPlayerName, board, playerShips);
 		
@@ -86,8 +91,12 @@ public class Window {
 		gameFrame.add(turnLabel);
 		
 		resultLabel = new JLabel("");
-		resultLabel.setBounds(0, 680, 300, 50);
+		resultLabel.setBounds(0, 680, 900, 50);
 		gameFrame.add(resultLabel);
+		
+		scores = new JLabel("");
+		scores.setBounds(0, 710, 900, 50);
+		gameFrame.add(scores);
 		
 		gameStatus = new JLabel("Game in progress");
 		gameStatus.setBounds(0, 750, 300, 50);
@@ -216,6 +225,9 @@ public class Window {
 							lblAttackGrid[row][col].setEnabled(false);
 							result = "Prev Turn Result: " + result;
 							resultLabel.setText(result);
+							
+							scores.setText(Game.gameScores);
+							
 							if(Game.checkIfGameWon() == true) {
 								gameStatus.setText("Game Over. Winner is " + Game.getWinner());
 								JOptionPane.showMessageDialog(null, 
@@ -250,11 +262,11 @@ public class Window {
 		placeShip4.addMouseListener(lblDnd);
 		placeShip5.addMouseListener(lblDnd);
 		
-		placeShip1.setBounds(400, 670, 200, 10);
-		placeShip2.setBounds(400, 690, 200, 10);
-		placeShip3.setBounds(400, 710, 200, 10);
-		placeShip4.setBounds(400, 730, 200, 10);
-		placeShip5.setBounds(400, 750, 200, 10);
+		placeShip1.setBounds(1100, 670, 200, 10);
+		placeShip2.setBounds(1100, 690, 200, 10);
+		placeShip3.setBounds(1100, 710, 200, 10);
+		placeShip4.setBounds(1100, 730, 200, 10);
+		placeShip5.setBounds(1100, 750, 200, 10);
 		
 		f.add(placeShip1);
 		f.add(placeShip2);
@@ -423,6 +435,16 @@ public class Window {
 									}
 								}
 								if(place == true) {
+									for(int k = 0; k < Board.BOARD_ROWS; k++) {
+										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+											place = false;
+											break;
+										}
+									}
+								}
+								
+								if(place == true) {
 									String shipPos = "";
 									for(int k = i; k < (i + 3); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
@@ -454,6 +476,17 @@ public class Window {
 										break;
 									}
 								}
+								
+								if(place == true) {
+									for(int k = 0; k < Board.BOARD_ROWS; k++) {
+										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+											place = false;
+											break;
+										}
+									}
+								}
+								
 								if(place == true) {
 									String shipPos = "";
 									for(int k = i; k < (i + 2); k++) {

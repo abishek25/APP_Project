@@ -6,7 +6,7 @@ package model;
  */
 public class Ship {
 	String name;
-	boolean holes[];
+	public boolean holes[];
 	public String unfilledHoles[];
 	
 	/**
@@ -38,7 +38,7 @@ public class Ship {
 	 * @return The success or failure
 	 */
 	public boolean shipHit() {
-		if(isShipSunk() == false) {
+		if(isShipSunk() == true) {
 			return false;
 		}
 		for(int i = 0; i < holes.length; i++) {
