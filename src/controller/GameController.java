@@ -56,4 +56,12 @@ public class GameController {
 	public String processAttack(int row, int col) {
 		return game.processAttack(row, col);
 	}
+	
+	public int getP1Score() {
+		return game.getPlayerOneResults();
+	}
+	
+	public int getAIScore() {
+		return game.getPlayerTwoResults();
+	}
 }

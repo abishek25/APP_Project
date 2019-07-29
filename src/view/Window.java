@@ -61,19 +61,12 @@ public class Window {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
-				int gameMode = Game.GAME_TYPE_SALVA;
+				String strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
+				int gameMode = Game.GAME_TYPE_REGULAR;
 				
-				/*
-				String positions1 = JOptionPane.showInputDialog(""
-						+ "Please input placement positions for\n"
-						+ "Carrier(5),Battleship(4),Cruiser(3),Submarine(3),Destroyer(2) respectively\n"
-						+ "Comma Separated Values\n"
-						+ "Example: (A1,A5),(B2,B5),(C3,C5),(D4,D6),(E5,E6): ");
-				
-				while(Game.checkPositions(positions1) == false) {
-					positions1 = JOptionPane.showInputDialog("Incorrect positions. Try again: ");
+				if(strGameMode.equals("1")) {
+					gameMode = Game.GAME_TYPE_SALVA;
 				}
-				*/
 				
 				gameController = new GameController(gameMode);
 				createBoardDisplay(gameFrame);
@@ -206,9 +199,7 @@ public class Window {
 								}
 								else {
 									String resuts[] = result.split(" ");
-									System.out.println(resuts);
 									for(int i = 0; i < resuts.length; i++) {
-										System.out.println(resuts[i]);
 										String info[] = resuts[i].split("#");
 										int trow = Integer.parseInt(info[0]);
 										int tcol = Integer.parseInt(info[1]);
@@ -227,7 +218,10 @@ public class Window {
 							resultLabel.setText(result);
 							if(Game.checkIfGameWon() == true) {
 								gameStatus.setText("Game Over. Winner is " + Game.getWinner());
-								JOptionPane.showMessageDialog(null, Game.getWinner() + " won the game.", 
+								JOptionPane.showMessageDialog(null, 
+										Game.getWinner() + " won the game. Scores: " + 
+												tmpPlayerName + "(" + gameController.getP1Score() + ")" +
+												" AND AI (" + gameController.getAIScore() + ")", 
 										"Game Over", JOptionPane.INFORMATION_MESSAGE);
 								System.exit(0);
 							}
@@ -353,6 +347,16 @@ public class Window {
 									}
 								}
 								if(place == true) {
+									for(int k = 0; k < Board.BOARD_ROWS; k++) {
+										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+											place = false;
+											break;
+										}
+									}
+								}
+								
+								if(place == true) {
 									String shipPos = "";
 									for(int k = i; k < (i + 5); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");
@@ -381,6 +385,17 @@ public class Window {
 										break;
 									}
 								}
+								
+								if(place == true) {
+									for(int k = 0; k < Board.BOARD_ROWS; k++) {
+										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+											place = false;
+											break;
+										}
+									}
+								}
+								
 								if(place == true) {
 									for(int k = i; k < (i + 4); k++) {
 										lblShipPlacementGrid[k][j].setText("SHIP");

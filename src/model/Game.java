@@ -16,6 +16,7 @@ public class Game {
 	
 	public static int GAME_TYPE_REGULAR = 1;
 	public static int GAME_TYPE_SALVA = 2;
+	public static int TURN_TIMER_MAX = 5;
 	
 	public static Random rand = new Random();
 	
@@ -32,6 +33,12 @@ public class Game {
 	static int prevAIAttackResult;
 	static int prevAIAttackRow;
 	static int prevAIAttackCol;
+	
+	Integer playerTurnTimer;
+	
+	int playerOneScore;
+	int playerTwoScore;
+	
 	
 	/**
 	 * This function checks positions passed for placement of ship
@@ -131,6 +138,10 @@ public class Game {
 		currPlayer = 0;
 		isFinished = false;
 		salvaAttackRes = new ArrayList<String>();
+		playerOneScore = 0;
+		playerTwoScore = 0;
+		playerTurnTimer = 0;
+		timer.start();
 	}
 	
 	/**
@@ -147,6 +158,10 @@ public class Game {
 		mode = GAME_MODE_NETWORK;
 		currPlayer = 0;
 		salvaAttackRes = new ArrayList<String>();
+		playerOneScore = 0;
+		playerTwoScore = 0;
+		playerTurnTimer = 0;
+		timer.start();
 	}
 	
 	/**
@@ -232,6 +247,7 @@ public class Game {
 		if(result.equals(Player.ATTACK_HIT)) {
 			players[1].board.attack_grid[row][col] = Board.BOARD_HIT;
 			prevAIAttackResult = 1;
+			playerTwoScore++;
 		}
 		else if(result.equals(Player.ATTACK_MISS)){
 			players[1].board.attack_grid[row][col] = Board.BOARD_MISS;
@@ -281,13 +297,27 @@ public class Game {
 				System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
 				if(result.equals(Player.ATTACK_HIT)) {
 					players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+					synchronized (playerTurnTimer) {
+						if(playerTurnTimer <= TURN_TIMER_MAX) {
+							playerOneScore++;
+						}
+					}
+					
 				}
 				else {
 					players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+					synchronized (playerTurnTimer) {
+						if(playerTurnTimer > TURN_TIMER_MAX) {
+							playerOneScore--;
+						}
+					}
 				}
 				updateGameStatus(players[1].board);
 				if(isFinished == false) {
 					generateAiAttack();
+					synchronized (playerTurnTimer) {
+						playerTurnTimer = 0;
+					}
 					updateGameStatus(players[0].board);
 					if(isFinished == true) {
 						winnerName = players[1].getName();
@@ -301,9 +331,21 @@ public class Game {
 				result = players[1].checkAttack(row, col);
 				if(result.equals(Player.ATTACK_HIT)) {
 					players[0].board.attack_grid[row][col] = Board.BOARD_HIT;
+					synchronized (playerTurnTimer) {
+						if(playerTurnTimer <= TURN_TIMER_MAX) {
+							playerOneScore++;
+						}
+						playerOneScore = 0;
+					}
 				}
 				else {
 					players[0].board.attack_grid[row][col] = Board.BOARD_MISS;
+					synchronized (playerTurnTimer) {
+						if(playerTurnTimer > TURN_TIMER_MAX) {
+							playerOneScore--;
+						}
+						playerOneScore = 0;
+					}
 				}
 				
 				salvaAttackRes.add(row + "#" + col + "#" + result.substring(11));
@@ -319,6 +361,9 @@ public class Game {
 					if(isFinished == false) {
 						for(int i = 0; i < players[1].numShipsAlive; i++) {
 							generateAiAttack();
+						}
+						synchronized (playerTurnTimer) {
+							playerTurnTimer = 0;
 						}
 						updateGameStatus(players[0].board);
 						if(isFinished == true) {
@@ -364,5 +409,34 @@ public class Game {
 	 */
 	public static boolean checkIfGameWon() {
 		return isFinished;
+	}
+	
+	
+	public Thread timer = new Thread() {
+		public void run() {
+			while(true) {
+				try {
+					Thread.sleep(1000);
+					synchronized (playerTurnTimer) {
+						playerTurnTimer++;
+						System.out.println("Timer: " + playerTurnTimer);
+						if(playerTurnTimer > Game.TURN_TIMER_MAX) {
+							System.out.println("Timer Expired");
+						}
+					}
+				}
+				catch(Exception e) {
+					
+				}
+			}
+		}
+	};
+	
+	public int getPlayerOneResults() {
+		return playerOneScore;
+	}
+	
+	public int getPlayerTwoResults() {
+		return playerTwoScore;
 	}
 }
