@@ -202,6 +202,7 @@ public class Game {
 	
 	/**
 	 * Function to generate ai attack
+	 * @return The attack result
 	 */
 	public String generateAiAttack() {
 		ArrayList<String> possiblepairs = new ArrayList<String>();
