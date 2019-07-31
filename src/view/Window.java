@@ -50,7 +50,7 @@ public class Window {
 	public Board board;
 	public String[] playerShips;
 	
-	public static int DEV_TEST = 1;
+	public static int DEV_TEST = 0;
 	
 	/**
 	 * Function to create the file's new game menu item
