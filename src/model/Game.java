@@ -20,21 +20,21 @@ public class Game {
 	
 	public static Random rand = new Random();
 	
-	Player[] players;
+	public Player[] players;
 	int mode;
 	public static int gameMode;
 	
 	public static ArrayList<String> salvaAttackRes;
 	
 	int currPlayer;
-	static boolean isFinished;
+	public static boolean isFinished;
 	static String winnerName;
 	
 	static int prevAIAttackResult;
 	static int prevAIAttackRow;
 	static int prevAIAttackCol;
 	
-	Integer playerTurnTimer;
+	public Integer playerTurnTimer;
 	
 	int playerOneScore;
 	int playerTwoScore;
@@ -203,7 +203,7 @@ public class Game {
 	/**
 	 * Function to generate ai attack
 	 */
-	public void generateAiAttack() {
+	public String generateAiAttack() {
 		ArrayList<String> possiblepairs = new ArrayList<String>();
 		int i1 = 0;
 		int j1 = 0;
@@ -262,6 +262,7 @@ public class Game {
 		prevAIAttackCol = col;
 		
 		System.out.println("AI Attack Result For (" + row + "," + col + "): " + result);
+		return row + "#" + col + "#" + result;
 	}
 	
 	/**

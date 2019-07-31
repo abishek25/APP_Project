@@ -98,6 +98,9 @@ public class Player {
 		ships[4] = new Ship("Destroyer", 2);
 		
 		for(int i = 0; i < 5; i++) {
+			if(playerShips[i] == null) {
+				break;
+			}
 			String[] pos = playerShips[i].split(",");
 			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
 				ships[i].unfilledHoles[j] = pos[j];

@@ -29,9 +29,9 @@ import model.Player;
 public class Window {
 	
 	JFrame gameFrame; 
-	GameController gameController;
-	JButton[][] lblAttackGrid;
-	JLabel[][] lblShipPlacementGrid;
+	public GameController gameController;
+	public JButton[][] lblAttackGrid;
+	public JLabel[][] lblShipPlacementGrid;
 	JLabel turnLabel;
 	JLabel resultLabel;
 	JLabel scores;
@@ -47,7 +47,7 @@ public class Window {
 	int numShipsPlaced = 0;
 	
 	String tmpPlayerName;
-	Board board;
+	public Board board;
 	public String[] playerShips;
 	
 	public static int DEV_TEST = 1;
@@ -92,6 +92,10 @@ public class Window {
 	 * @param board The game board
 	 */
 	public void createGameAndPlayer(Board board) {
+		if(gameFrame == null) {
+			return;
+		}
+		
 		gameController.createGame(tmpPlayerName, board, playerShips);
 		
 		turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
@@ -383,17 +387,20 @@ public class Window {
 		String[] numShips = shipText.split("#");
 		
 		if(checkShipPlacementSpace(i, Board.BOARD_ROWS, numShips.length) == false) {
-			JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
 			return false;
 		}
 		
 		if(checkIfRowAreaOccupiedByAnotherShip(i, j, numShips.length, lblShipPlacementGrid) == true) {
-			JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
 			return false;
 		}
 		
 		if(checkIfShipInEntireRow(j, Board.BOARD_ROWS, lblShipPlacementGrid) == true) {
-			JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
 			return false;
 		}
 		
@@ -414,17 +421,21 @@ public class Window {
 		String[] numShips = shipText.split("#");
 		
 		if(checkShipPlacementSpace(j, Board.BOARD_COLS, numShips.length) == false) {
-			JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
+			System.out.println(DEV_TEST);
 			return false;
 		}
 		
 		if(checkIfColAreaOccupiedByAnotherShip(i, j, numShips.length, lblShipPlacementGrid) == true) {
-			JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
 			return false;
 		}
 		
 		if(checkIfShipInEntireCol(i, Board.BOARD_COLS, lblShipPlacementGrid) == true) {
-			JOptionPane.showMessageDialog(null, "There is already a ship in this col. Please try again");
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "There is already a ship in this col. Please try again");
 			return false;
 		}
 		
