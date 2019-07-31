@@ -24,8 +24,8 @@ public class GameController {
 	/**
 	 * Function to create game
 	 * @param player1Name The player 1 name
-	 * @param positions1 The player 1 positions
-	 * @param player1 ships
+	 * @param board The game board
+	 * @param playerShips ships
 	 */
 	public void createGame(String player1Name, Board board, String[] playerShips) {
 		game = new Game(player1Name, board, gameMode, playerShips);

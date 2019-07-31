@@ -11,7 +11,7 @@ public class Ship {
 	
 	/**
 	 * Function to initialize the ship holes
-	 * @param numHoles
+	 * @param numHoles The number of holes
 	 */
 	public void initHoles(int numHoles) {
 		this.holes = new boolean[numHoles];
