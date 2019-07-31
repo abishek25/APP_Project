@@ -50,6 +50,8 @@ public class Window {
 	Board board;
 	public String[] playerShips;
 	
+	public static int DEV_TEST = 1;
+	
 	/**
 	 * Function to create the file's new game menu item
 	 * @return The menu item
@@ -61,8 +63,14 @@ public class Window {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
-				String strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
+				String player1 = "TestPlayer";
+				if(DEV_TEST != 1) {
+					player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
+				}
+				String strGameMode = "1";
+				if(DEV_TEST != 1) {
+					strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
+				}
 				int gameMode = Game.GAME_TYPE_REGULAR;
 				
 				if(strGameMode.equals("1")) {
@@ -104,6 +112,7 @@ public class Window {
 		
 		gameFrame.revalidate();
 		refreshBoard();
+		JOptionPane.showMessageDialog(null, "Game Begins");
 	}
 	
 	/**
@@ -194,6 +203,7 @@ public class Window {
 							int row = cmd.charAt(0) - 65;
 							int col = Integer.parseInt(cmd.substring(1)) - 1;
 							String result = processCommand(row, col);
+							System.out.println("Window received result: " + result);
 							if(Game.gameMode == Game.GAME_TYPE_REGULAR) {
 								if(result.equals(Player.ATTACK_HIT)) {
 									lblAttackGrid[row][col].setText("*HIT");
@@ -208,17 +218,23 @@ public class Window {
 								}
 								else {
 									String resuts[] = result.split(" ");
+									String salvaResult = "";
+									
 									for(int i = 0; i < resuts.length; i++) {
 										String info[] = resuts[i].split("#");
 										int trow = Integer.parseInt(info[0]);
 										int tcol = Integer.parseInt(info[1]);
 										if(info[2].equals("missed")) {
 											lblAttackGrid[trow][tcol].setText("MISS");
+											salvaResult += "missed ";
 										}
 										else {
 											lblAttackGrid[trow][tcol].setText("*HIT");
+											salvaResult += "success ";
 										}
 									}
+									
+									result = salvaResult;
 								}
 							}
 							
@@ -274,6 +290,9 @@ public class Window {
 		f.add(placeShip4);
 		f.add(placeShip5);
 		
+		if(DEV_TEST == 1) {
+			autoShipPlacementForTesting();
+		}
 	}
 
 	/**
@@ -297,6 +316,131 @@ public class Window {
 		initMainFrame();
 	}
 	
+	public boolean checkShipPlacementSpace(int rowNum, int maxRows, int shipSpace) {
+		if(rowNum > (maxRows - shipSpace)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean checkIfRowAreaOccupiedByAnotherShip(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
+		for(int k = i; k < (i + shipSpace); k++) {
+			if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkIfColAreaOccupiedByAnotherShip(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
+		for(int k = j; k < (j + shipSpace); k++) {
+			if(lblShipPlacementGrid[i][k].getText().equals("SHIP")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkIfShipInEntireRow(int j, int maxRows, JLabel[][] lblShipPlacementGrid) {
+		for(int k = 0; k < maxRows; k++) {
+			if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkIfShipInEntireCol(int i, int maxCols, JLabel[][] lblShipPlacementGrid) {
+		for(int k = 0; k < maxCols; k++) {
+			if(lblShipPlacementGrid[i][k].getText().equals("SHIP")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void fillPlayerShip(int shipSpace, String shipPos) {
+		if(shipSpace == 5) {
+			playerShips[0] = shipPos;
+		}
+		else if(shipSpace == 4) {
+			playerShips[1] = shipPos;
+		}
+		else if(shipSpace == 3) {
+			if(playerShips[2] == null || playerShips[2].length() < 2) {
+				playerShips[2] = shipPos;
+			}
+			else {
+				playerShips[3] = shipPos;
+			}
+		}
+		else if(shipSpace == 2) {
+			playerShips[4] = shipPos;
+		}
+	}
+	
+	public boolean processShipPlacementHorizontally(int i, int j, String shipText) {
+		String[] numShips = shipText.split("#");
+		
+		if(checkShipPlacementSpace(i, Board.BOARD_ROWS, numShips.length) == false) {
+			JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
+			return false;
+		}
+		
+		if(checkIfRowAreaOccupiedByAnotherShip(i, j, numShips.length, lblShipPlacementGrid) == true) {
+			JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
+			return false;
+		}
+		
+		if(checkIfShipInEntireRow(j, Board.BOARD_ROWS, lblShipPlacementGrid) == true) {
+			JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+			return false;
+		}
+		
+		String shipPos = "";
+		
+		for(int k = i; k < (i + numShips.length); k++) {
+			lblShipPlacementGrid[k][j].setText("SHIP");
+			board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
+			shipPos += k + "" + j + ",";
+		}
+		
+		fillPlayerShip(numShips.length, shipPos);
+		numShipsPlaced++;
+		return true;
+	}
+	
+	public boolean processShipPlacementVertically(int i, int j, String shipText) {
+		String[] numShips = shipText.split("#");
+		
+		if(checkShipPlacementSpace(j, Board.BOARD_COLS, numShips.length) == false) {
+			JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
+			return false;
+		}
+		
+		if(checkIfColAreaOccupiedByAnotherShip(i, j, numShips.length, lblShipPlacementGrid) == true) {
+			JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
+			return false;
+		}
+		
+		if(checkIfShipInEntireCol(i, Board.BOARD_COLS, lblShipPlacementGrid) == true) {
+			JOptionPane.showMessageDialog(null, "There is already a ship in this col. Please try again");
+			return false;
+		}
+		
+		String shipPos = "";
+		
+		for(int k = j; k < (j + numShips.length); k++) {
+			lblShipPlacementGrid[i][k].setText("SHIP");
+			board.ship_placement_grid[i][k] = Board.PLACEMENT_BOARD_SHIP;
+			shipPos += i + "" + k + ",";
+		}
+		
+		fillPlayerShip(numShips.length, shipPos);
+		numShipsPlaced++;
+		return true;
+	}
+	
 	/**
 	 * The main function called by OS
 	 * @param args The command line argumeents
@@ -305,11 +449,29 @@ public class Window {
 		Window win = new Window();
 		win.start();
 	}
+	
+	public void autoShipPlacementForTesting() {
+		String shipText = "SHIP#SHIP#SHIP#SHIP#SHIP";
+		processShipPlacementVertically(0, 0, shipText);
+		
+		shipText = "SHIP#SHIP#SHIP#SHIP";
+		processShipPlacementVertically(1, 1, shipText);
+		
+		shipText = "SHIP#SHIP#SHIP";
+		processShipPlacementVertically(2, 2, shipText);
+		
+		shipText = "SHIP#SHIP#SHIP";
+		processShipPlacementVertically(3, 3, shipText);
+		
+		shipText = "SHIP#SHIP";
+		processShipPlacementVertically(4, 4, shipText);
+		
+		createGameAndPlayer(board);
+	}
 
 	MouseListener lblDnd = new MouseListener() {
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			//toMoveShip.setBounds(e.getXOnScreen() - 5, e.getYOnScreen() - 60, 200, 10);
 			
 			int minx = 0;
 			int miny = 0;
@@ -344,171 +506,24 @@ public class Window {
 					JLabel tmpLbl = lblShipPlacementGrid[i][j];
 					
 					if(tmpLbl.getX() == targetx && tmpLbl.getY() == targety) {
-						String[] numShips = toMoveShip.getText().split("#");
-						if(numShips.length == 5) {
-							if(i > (Board.BOARD_ROWS - 5)) {
-								JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
-							}
-							else {
-								boolean place = true;
-								for(int k = i; k < (i + 5); k++) {
-									if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-										JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
-										place = false;
-										break;
-									}
-								}
-								if(place == true) {
-									for(int k = 0; k < Board.BOARD_ROWS; k++) {
-										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
-											place = false;
-											break;
-										}
-									}
-								}
-								
-								if(place == true) {
-									String shipPos = "";
-									for(int k = i; k < (i + 5); k++) {
-										lblShipPlacementGrid[k][j].setText("SHIP");
-										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
-										shipPos += k + "" + j + ",";
-									}
-									
-									playerShips[0] = shipPos;
-									toMoveShip.setText("");
-									toMoveShip.disable();
-									numShipsPlaced++;
-								}
-							}
+						String horizontalVertical = JOptionPane.showInputDialog("Enter 1 to place horizontally, anything else to place vertically");
+						Boolean shipPlacementResult = false;
+						if(horizontalVertical.equals("1")) {
+							shipPlacementResult = processShipPlacementHorizontally(i, j, toMoveShip.getText());
 						}
-						else if(numShips.length == 4) {
-							if(i > (Board.BOARD_ROWS - 4)) {
-								JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
-							}
-							else {
-								boolean place = true;
-								String shipPos = "";
-								for(int k = i; k < (i + 4); k++) {
-									if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-										JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
-										place = false;
-										break;
-									}
-								}
-								
-								if(place == true) {
-									for(int k = 0; k < Board.BOARD_ROWS; k++) {
-										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
-											place = false;
-											break;
-										}
-									}
-								}
-								
-								if(place == true) {
-									for(int k = i; k < (i + 4); k++) {
-										lblShipPlacementGrid[k][j].setText("SHIP");
-										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
-										shipPos += k + "" + j + ",";
-									}
-									playerShips[1] = shipPos;
-									toMoveShip.setText("");
-									toMoveShip.disable();
-									numShipsPlaced++;
-								}
-							}
+						else {
+							shipPlacementResult = processShipPlacementVertically(i, j, toMoveShip.getText());
 						}
-						else if(numShips.length == 3) {
-							if(i > (Board.BOARD_ROWS - 3)) {
-								JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
-							}
-							else {
-								boolean place = true;
-								for(int k = i; k < (i + 3); k++) {
-									if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-										JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
-										place = false;
-										break;
-									}
-								}
-								if(place == true) {
-									for(int k = 0; k < Board.BOARD_ROWS; k++) {
-										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
-											place = false;
-											break;
-										}
-									}
-								}
-								
-								if(place == true) {
-									String shipPos = "";
-									for(int k = i; k < (i + 3); k++) {
-										lblShipPlacementGrid[k][j].setText("SHIP");
-										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
-										shipPos += k + "" + j + ",";
-									}
-									if(playerShips[2] == null || playerShips[2].length() < 2) {
-										playerShips[2] = shipPos;
-									}
-									else {
-										playerShips[3] = shipPos;
-									}
-									toMoveShip.setText("");
-									toMoveShip.disable();
-									numShipsPlaced++;
-								}
-							}
-						}
-						else if(numShips.length == 2) {
-							if(i > (Board.BOARD_ROWS - 2)) {
-								JOptionPane.showMessageDialog(null, "Not enough space to put the selected ship. Please try again");
-							}
-							else {
-								boolean place = true;
-								for(int k = i; k < (i + 2); k++) {
-									if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-										JOptionPane.showMessageDialog(null, "Area occupied by another ship. Please try again");
-										place = false;
-										break;
-									}
-								}
-								
-								if(place == true) {
-									for(int k = 0; k < Board.BOARD_ROWS; k++) {
-										if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
-											JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
-											place = false;
-											break;
-										}
-									}
-								}
-								
-								if(place == true) {
-									String shipPos = "";
-									for(int k = i; k < (i + 2); k++) {
-										lblShipPlacementGrid[k][j].setText("SHIP");
-										board.ship_placement_grid[k][j] = Board.PLACEMENT_BOARD_SHIP;
-										shipPos += k + "" + j + ",";
-									}
-									playerShips[4] = shipPos;
-									toMoveShip.setText("");
-									toMoveShip.disable();
-									numShipsPlaced++;
-								}
-							}
+						if(shipPlacementResult == true) {
+							toMoveShip.setText("");
+							toMoveShip.disable();
 						}
 					}
 				}
 			}
 			
-			// toMoveShip.setBounds(targetx, targety, 200, 10);
 			toMoveShip = null;
-			
-			System.out.println("Number of Ships placed: " + numShipsPlaced);
+
 			if(numShipsPlaced == 5) {
 				System.out.println("All Ships placed. Game starts now");
 				createGameAndPlayer(board);
@@ -526,6 +541,5 @@ public class Window {
 		
 		@Override public void mouseClicked(MouseEvent e) {}
 	};
-	
 	
 }
