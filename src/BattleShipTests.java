@@ -9,8 +9,15 @@ import model.Player;
 import model.Ship;
 import view.Window;
 
+/**
+ * It tests the code for integrity
+ *
+ */
 class BattleShipTests {
 
+	/**
+	 * Test one to check initHoles
+	 */
 	@Test
 	void test1() {
 		Ship ship = new Ship("test", 4);

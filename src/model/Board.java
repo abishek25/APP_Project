@@ -62,7 +62,7 @@ public class Board {
 	
 	/**
 	 * The function to return ship placement grid
-	 * @return
+	 * @return The ship placement grid
 	 */
 	public int[][] getShipPlacementGrid() {
 		return ship_placement_grid;
