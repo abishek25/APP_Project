@@ -383,6 +383,48 @@ public class Window {
 		}
 	}
 	
+	public boolean checkVerticalParallel(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
+		if(i > 0) {
+			int tmpi = i - 1;
+			for(int k = j; k < (j + shipSpace); k++) {
+				if(lblShipPlacementGrid[tmpi][k].getText().equals("SHIP")) {
+					return false;
+				}
+			}
+		}
+		if(i < (Board.BOARD_COLS - 1)) {
+			int tmpi = i + 1;
+			for(int k = j; k < (j + shipSpace); k++) {
+				if(lblShipPlacementGrid[tmpi][k].getText().equals("SHIP")) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean checkHorizontalParallel(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
+		if(j > 0) {
+			int tmpi = j - 1;
+			for(int k = i; k < (i + shipSpace); k++) {
+				if(lblShipPlacementGrid[k][tmpi].getText().equals("SHIP")) {
+					return false;
+				}
+			}
+		}
+		if(j < (Board.BOARD_COLS - 1)) {
+			int tmpi = j + 1;
+			for(int k = i; k < (i + shipSpace); k++) {
+				if(lblShipPlacementGrid[k][tmpi].getText().equals("SHIP")) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	public boolean processShipPlacementHorizontally(int i, int j, String shipText) {
 		String[] numShips = shipText.split("#");
 		
@@ -401,6 +443,12 @@ public class Window {
 		if(checkIfShipInEntireRow(j, Board.BOARD_ROWS, lblShipPlacementGrid) == true) {
 			if(DEV_TEST != 5)
 				JOptionPane.showMessageDialog(null, "There is already a ship in this row. Please try again");
+			return false;
+		}
+		
+		if(checkHorizontalParallel(i, j, numShips.length, lblShipPlacementGrid) == false) {
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "There is already a ship besides this ship");
 			return false;
 		}
 		
@@ -436,6 +484,12 @@ public class Window {
 		if(checkIfShipInEntireCol(i, Board.BOARD_COLS, lblShipPlacementGrid) == true) {
 			if(DEV_TEST != 5)
 				JOptionPane.showMessageDialog(null, "There is already a ship in this col. Please try again");
+			return false;
+		}
+		
+		if(checkVerticalParallel(i, j, numShips.length, lblShipPlacementGrid) == false) {
+			if(DEV_TEST != 5)
+				JOptionPane.showMessageDialog(null, "There is already a ship besides this ship");
 			return false;
 		}
 		
