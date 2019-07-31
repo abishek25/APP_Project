@@ -23,8 +23,7 @@ import model.Game;
 import model.Player;
 
 /**
- * The class is used to implement the user interface
- *
+ * This class represents the view of the game.
  */
 public class Window {
 	
@@ -53,8 +52,8 @@ public class Window {
 	public static int DEV_TEST = 0;
 	
 	/**
-	 * Function to create the file's new game menu item
-	 * @return The menu item
+	 * Function to create the file's new game menu item.
+	 * @return newGame The menu item.
 	 */
 	public JMenuItem createNewGameMenuItem() {
 		JMenuItem newGame = new JMenuItem("New Game");
@@ -88,7 +87,7 @@ public class Window {
 	}
 	
 	/**
-	 * Function to create game and player
+	 * Function creates the game with placed ship and updates the board.
 	 * @param board The game board
 	 */
 	public void createGameAndPlayer(Board board) {
@@ -140,7 +139,7 @@ public class Window {
 	}
 	
 	/**
-	 * Function to refresh the board display
+	 * Function to update the board display after any movement/attack.
 	 */
 	public void refreshBoard() {
 		Board board = gameController.getGame().getGameBoard();
@@ -162,9 +161,9 @@ public class Window {
 	}
 	
 	/**
-	 * Function to process the attack command
-	 * @param row The row to attack
-	 * @param col The column to attack
+	 * Function to process the attack command.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
 	 * @return The attack result
 	 */
 	public String processCommand(int row, int col) {
@@ -174,7 +173,7 @@ public class Window {
 	}
 
 	/**
-	 * Function to create the board display
+	 * The function to generate and display the board.
 	 * @param f The game frame
 	 */
 	public void createBoardDisplay(JFrame f) {
@@ -300,7 +299,7 @@ public class Window {
 	}
 
 	/**
-	 * Function to initialize java frame
+	 * This function generates the java frame.
 	 */
 	public void initMainFrame() {
 		JFrame.setDefaultLookAndFeelDecorated(true);
@@ -320,6 +319,13 @@ public class Window {
 		initMainFrame();
 	}
 	
+	/**
+	 * Function to check whether ship is placed inside the board or not. 
+	 * @param rowNum The row co-ordinate from which ship will be placed
+	 * @param maxRows Maximum number of rows of the board
+	 * @param shipSpace The length of the ship
+	 * @return false if outside the board size else true
+	 */
 	public boolean checkShipPlacementSpace(int rowNum, int maxRows, int shipSpace) {
 		if(rowNum > (maxRows - shipSpace)) {
 			return false;
@@ -327,6 +333,14 @@ public class Window {
 		return true;
 	}
 	
+	/**
+	 * Function checks whether there is already a ship placed on that row co-ordinates.
+	 * @param i The row co-ordinate
+	 * @param j The column co-ordinate
+	 * @param shipSpace The length of the ship
+	 * @param lblShipPlacementGrid The player board
+	 * @return true if occupied else false.
+	 */
 	public boolean checkIfRowAreaOccupiedByAnotherShip(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
 		for(int k = i; k < (i + shipSpace); k++) {
 			if(lblShipPlacementGrid[k][j].getText().equals("SHIP")) {
@@ -336,6 +350,14 @@ public class Window {
 		return false;
 	}
 	
+	/**
+	 * Function checks whether there is already a ship placed on that column co-ordinates.
+	 * @param i The row co-ordinate
+	 * @param j The column co-ordinate
+	 * @param shipSpace The length of the ship
+	 * @param lblShipPlacementGrid The player board
+	 * @return true if occupied else false.
+	 */
 	public boolean checkIfColAreaOccupiedByAnotherShip(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
 		for(int k = j; k < (j + shipSpace); k++) {
 			if(lblShipPlacementGrid[i][k].getText().equals("SHIP")) {
@@ -344,6 +366,7 @@ public class Window {
 		}
 		return false;
 	}
+	
 	
 	public boolean checkIfShipInEntireRow(int j, int maxRows, JLabel[][] lblShipPlacementGrid) {
 		for(int k = 0; k < maxRows; k++) {
@@ -363,6 +386,11 @@ public class Window {
 		return false;
 	}
 	
+	/**
+	 * This function places the ship on the board according to the length of the ship.
+	 * @param shipSpace The length of the ship
+	 * @param shipPos String containing the co-ordinates
+	 */
 	public void fillPlayerShip(int shipSpace, String shipPos) {
 		if(shipSpace == 5) {
 			playerShips[0] = shipPos;
@@ -383,6 +411,13 @@ public class Window {
 		}
 	}
 	
+	/**
+	 * The function to place ship horizontally.
+	 * @param i The row co-ordinate
+	 * @param j The column co-ordinate
+	 * @param shipText The length of the ship
+	 * @return true if constraints satisfies else false.
+	 */
 	public boolean processShipPlacementHorizontally(int i, int j, String shipText) {
 		String[] numShips = shipText.split("#");
 		
@@ -417,6 +452,13 @@ public class Window {
 		return true;
 	}
 	
+	/**
+	 * The function to place ship vertically.
+	 * @param i The row co-ordinate
+	 * @param j The column co-ordinate
+	 * @param shipText The length of the ship
+	 * @return true if constraints are satisfies else false.
+	 */
 	public boolean processShipPlacementVertically(int i, int j, String shipText) {
 		String[] numShips = shipText.split("#");
 		
@@ -461,6 +503,9 @@ public class Window {
 		win.start();
 	}
 	
+	/**
+	 * The function places the ships for testing function.
+	 */
 	public void autoShipPlacementForTesting() {
 		String shipText = "SHIP#SHIP#SHIP#SHIP#SHIP";
 		processShipPlacementVertically(0, 0, shipText);
@@ -480,6 +525,9 @@ public class Window {
 		createGameAndPlayer(board);
 	}
 
+	/**
+	 * Listeners for the ship(JLabel).
+	 */
 	MouseListener lblDnd = new MouseListener() {
 		@Override
 		public void mouseReleased(MouseEvent e) {

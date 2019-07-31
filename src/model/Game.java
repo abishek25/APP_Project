@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.Random;
 
 /**
- * This class is used to hold information about the game in progress
- *
+ * This class is used to hold information about the game in progress.
  */
 public class Game {
 	
@@ -124,7 +123,7 @@ public class Game {
 	}
 	
 	/**
-	 * The consutructor to get information about the players playing the game
+	 * The constructor to set/initialize information about the game and also start the timer
 	 * @param playerOneName The player name
 	 * @param board The game board
 	 * @param gameMode The game mode
@@ -146,7 +145,7 @@ public class Game {
 	}
 	
 	/**
-	 * Constructor to get information about two players
+	 * Constructor to set/initialize information about two players
 	 * @param playerOneName Player 1 name
 	 * @param player1Positions Player 1 positions
 	 * @param playerTwoName Player 2 name
@@ -182,7 +181,7 @@ public class Game {
 	}
 	
 	/**
-	 * Function to get ai board
+	 * Function to get AI board
 	 * @return The game board of AI
 	 */
 	public Board getAiBoard() {
@@ -201,8 +200,8 @@ public class Game {
 	}
 	
 	/**
-	 * Function to generate ai attack
-	 * @return The attack result
+	 * Function generates attack of AI and also  updates the board according to the success or failure of the attack.
+	 * @return result The attack result(hit or miss)
 	 */
 	public String generateAiAttack() {
 		ArrayList<String> possiblepairs = new ArrayList<String>();
@@ -267,8 +266,8 @@ public class Game {
 	}
 	
 	/**
-	 * Function to update game status
-	 * @param board The new game status after attack
+	 * Function to check whether there is any ship left on the board.
+	 * @param board The board which needs to be checked
 	 */
 	public void updateGameStatus(Board board) {
 		boolean rt = false;
@@ -290,6 +289,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The function to handle the successful attack immediately for basic game alongwith score.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
+	 * @param attackGrid Board on which attack result needs to be updated
+	 */
 	public void processRegularAttackHit(int row, int col, int[][] attackGrid) {
 		attackGrid[row][col] = Board.BOARD_HIT;
 		
@@ -300,6 +305,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The function to handle the unsuccessful attack immediately for basic game alongwith score.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
+	 * @param attackGrid Board on which attack result needs to be updated
+	 */
 	public void processRegularAttackMiss(int row, int col, int[][] attackGrid) {
 		attackGrid[row][col] = Board.BOARD_MISS;
 		
@@ -310,6 +321,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The function to process the result of the attack.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
+	 * @param result The result of the attack
+	 */
 	public void processRegularAttackResult(int row, int col, String result) {
 		if(result.equals(Player.ATTACK_HIT)) {
 			processRegularAttackHit(row, col, players[0].board.attack_grid);
@@ -319,12 +336,21 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The function to reset the timer of the player after attack.
+	 */
 	public void resetPlayerTimer() {
 		synchronized (playerTurnTimer) {
 			playerTurnTimer = 0;
 		}
 	}
 	
+	/**
+	 * Function to check attack for basic game.
+	 * @param row The row co-ordinate of the attack
+	 * @param col The column co-ordinate of the attack
+	 * @return result The result whether it is hit or miss
+	 */
 	public String regularAttack(int row, int col) {
 		String result = players[1].checkAttack(row, col);
 		System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
@@ -347,6 +373,12 @@ public class Game {
 		return result;
 	}
 	
+	/**
+	 * The function to handle the successful attack immediately for salva game alongwith score.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
+	 * @param attackGrid Board on which attack result needs to be updated
+	 */
 	public void processSalvaAttackHit(int row, int col, int[][] attackGrid) {
 		attackGrid[row][col] = Board.BOARD_HIT;
 		synchronized (playerTurnTimer) {
@@ -357,6 +389,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * The function to handle the unsuccessful attack immediately for salva game alongwith score.
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
+	 * @param attackGrid Board on which attack result needs to be updated
+	 */
 	public void processSalvaAttackMiss(int row, int col, int[][] attackGrid) {
 		attackGrid[row][col] = Board.BOARD_MISS;
 		synchronized (playerTurnTimer) {
@@ -367,6 +405,12 @@ public class Game {
 		}
 	}
 	
+	/**
+	 * Function to check attack for Salva variation.
+	 * @param row The row co-ordinate of the attack
+	 * @param col The column co-ordinate of the attack
+	 * @return result The result whether it is hit or miss
+	 */
 	public String salvaAttack(int row, int col) {
 		String result = players[1].checkAttack(row, col);
 		if(result.equals(Player.ATTACK_HIT)) {
@@ -410,7 +454,7 @@ public class Game {
 	}
 	
 	/**
-	 * Function to process attack
+	 * Function to processes the attack based on game mode.
 	 * @param row The input row
 	 * @param col The input column
 	 * @return The result of attack
@@ -448,8 +492,8 @@ public class Game {
 	}
 	
 	/**
-	 * Function to get game status
-	 * @return Game status
+	 * Function to check whether the game is finished or not.
+	 * @return isFinished Current status of the game.
 	 */
 	public static boolean checkIfGameWon() {
 		return isFinished;

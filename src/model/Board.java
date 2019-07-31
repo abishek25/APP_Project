@@ -21,7 +21,7 @@ public class Board {
 	public int ship_placement_grid[][];
 	
 	/**
-	 * The function to initialize the ship placements
+	 * The function to initialize the board of player.
 	 */
 	public void init_ship_placement() {
 		this.ship_placement_grid = new int[BOARD_ROWS][BOARD_COLS];
@@ -33,7 +33,7 @@ public class Board {
 	}
 	
 	/**
-	 * The function to initialize the attack grids
+	 * The function to initialize the board of the AI.
 	 */
 	public void init_attack_grid() {
 		this.attack_grid = new int[BOARD_ROWS][BOARD_COLS];
@@ -70,8 +70,8 @@ public class Board {
 	
 	/**
 	 * The function to handle the attack on ship
-	 * @param row The row number
-	 * @param col The column number
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
 	 */
 	public void handleShipAttack(int row, int col) {
 		this.ship_placement_grid[row][col] = PLACEMENT_BOARD_SHIP_HIT;

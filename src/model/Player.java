@@ -81,7 +81,7 @@ public class Player {
 	}
 	
 	/**
-	 * Constructor with ships
+	 * Parameterized constructor with ships
 	 * @param name Name of player
 	 * @param board Game board
 	 * @param playerShips Player's ships
@@ -127,9 +127,9 @@ public class Player {
 	}
 	
 	/**
-	 * Function to checks ships
-	 * @param row Ship row
-	 * @param col Ship column
+	 * Function to check whether the ship has sunken or not.
+	 * @param row Ship row co-ordinate
+	 * @param col Ship column co-ordinate
 	 */
 	public void checkShips(int row, int col) {
 		
@@ -160,9 +160,9 @@ public class Player {
 	}
 	
 	/**
-	 * Function to check attack
-	 * @param row The attack row
-	 * @param col The attack column
+	 * The function checks whether the attack is a hit or miss and updates the board accordingly.
+	 * @param row The row co-ordinate of the attack
+	 * @param col The column co-ordinate of the attack.
 	 * @return The attack result
 	 */
 	public String checkAttack(int row, int col) {

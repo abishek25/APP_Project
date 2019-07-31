@@ -22,7 +22,7 @@ public class Ship {
 	
 	/**
 	 * Function to check if ship sunk
-	 * @return The success or failure
+	 * @return true if all holes are not filled else false
 	 */
 	public boolean isShipSunk() {
 		for(int i = 0; i < holes.length; i++) {
@@ -35,7 +35,7 @@ public class Ship {
 	
 	/**
 	 * Function to hit the ship
-	 * @return The success or failure
+	 * @return false if ship already sunken else true
 	 */
 	public boolean shipHit() {
 		if(isShipSunk() == true) {
@@ -50,7 +50,7 @@ public class Ship {
 	}
 	
 	/**
-	 * Constructor to get ship information
+	 * Parameterized constructor to set ship information
 	 * @param name The ship name
 	 * @param numHoles The ship number of holes
 	 */

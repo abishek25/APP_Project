@@ -14,8 +14,8 @@ public class GameController {
 	public int gameMode;
 	
 	/**
-	 * The constructor to assign game mode
-	 * @param gameMode The game mode
+	 * The parameterized constructor.
+	 * @param gameMode The game mode(Salva or Basic).
 	 */
 	public GameController(int gameMode) {
 		this.gameMode = gameMode;
@@ -49,8 +49,8 @@ public class GameController {
 	
 	/**
 	 * Function to process attack
-	 * @param row The row for attack
-	 * @param col The column for attack
+	 * @param row The row co-ordinate
+	 * @param col The column co-ordinate
 	 * @return The result of attack
 	 */
 	public String processAttack(int row, int col) {
