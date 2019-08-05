@@ -32,6 +32,7 @@ public class Game {
 	static int prevAIAttackResult;
 	static int prevAIAttackRow;
 	static int prevAIAttackCol;
+	static ArrayList<String> possiblePairs;
 	
 	public Integer playerTurnTimer;
 	
@@ -106,19 +107,43 @@ public class Game {
 	 */
 	public String randomShipPositions() {
 		ArrayList<Integer> rows = new ArrayList<Integer>();
-		for(int i = 0; i < (Board.BOARD_ROWS - 5); i++) {
+		ArrayList<Integer> selected_rows = new ArrayList<Integer>();
+		
+		for(int i = 0; i < (Board.BOARD_ROWS); i++) {
 			rows.add(i);
 		}
 		
 		int[] shipSizes = {4,3,2,2,1};
 		String aiPositions = "";
 		for(int i = 0; i < shipSizes.length; i++) {
+			if(rows.size() == 0) {
+				
+			}
 			Collections.shuffle(rows);
 			int row = rows.remove(0);
+			selected_rows.add(row);
+			for(int k = 0; k < rows.size(); k++) {
+				int check_row = row + 1;
+				int check_row_2 = row - 1;
+				if(rows.contains(check_row)) {
+					rows.remove(new Integer(check_row));
+					k--;
+				}
+				
+				if(rows.contains(check_row_2)) {
+					rows.remove(new Integer(check_row_2));
+					k--;
+				}
+				if(k < -1) {
+					break;
+				}
+			}
 			int col = rand.nextInt(Board.BOARD_COLS - shipSizes[i]) + 1;
 			aiPositions = aiPositions + "(" + ((char)(row + 65)) + col + "," + ((char)(row + 65)) + (col + shipSizes[i]) + "),";
+			System.out.println(aiPositions);
 		}
 		aiPositions = aiPositions.substring(0, aiPositions.length() - 1);
+		
 		return aiPositions;
 	}
 	
@@ -138,6 +163,7 @@ public class Game {
 		currPlayer = 0;
 		isFinished = false;
 		salvaAttackRes = new ArrayList<String>();
+		possiblePairs = new ArrayList<String>();
 		playerOneScore = 0;
 		playerTwoScore = 0;
 		playerTurnTimer = 0;
@@ -204,46 +230,55 @@ public class Game {
 	 * @return result The attack result(hit or miss)
 	 */
 	public String generateAiAttack() {
-		ArrayList<String> possiblepairs = new ArrayList<String>();
 		int i1 = 0;
 		int j1 = 0;
 		
 		if(prevAIAttackResult == 1) {
+			possiblePairs = new ArrayList<String>();
 			if(prevAIAttackCol < (Board.BOARD_COLS - 1)) {
 				i1 = prevAIAttackRow;
 				j1 = prevAIAttackCol + 1;
+				if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
+					possiblePairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+				}
 			}
-			else if(prevAIAttackCol > 0) {
+			if(prevAIAttackCol > 0) {
 				i1 = prevAIAttackRow;
 				j1 = prevAIAttackCol - 1;
+				if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
+					possiblePairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+				}
 			}
-			else if(prevAIAttackRow < (Board.BOARD_ROWS - 1)) {
+			if(prevAIAttackRow < (Board.BOARD_ROWS - 1)) {
 				i1 = prevAIAttackRow + 1;
 				j1 = prevAIAttackCol;
+				if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
+					possiblePairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+				}
 			}
-			else if(prevAIAttackRow > 0) {
+			if(prevAIAttackRow > 0) {
 				i1 = prevAIAttackRow - 1;
 				j1 = prevAIAttackCol;
-			}
-			
-			if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
-				possiblepairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+				if(players[1].board.attack_grid[i1][j1] == Board.BOARD_EMPTY) {
+					possiblePairs.add(String.valueOf(i1) + "," + String.valueOf(j1));
+				}
 			}
 		}
 		
-		if(possiblepairs.size() == 0) {
+		if(possiblePairs.size() == 0) {
 			for(int i = 0; i < Board.BOARD_ROWS; i++) {
 				for(int j = 0; j < Board.BOARD_COLS; j++) {
 					if(players[1].board.attack_grid[i][j] == Board.BOARD_EMPTY) {
-						possiblepairs.add(String.valueOf(i) + "," + String.valueOf(j));
+						possiblePairs.add(String.valueOf(i) + "," + String.valueOf(j));
 					}
 				}
 			}
 		}
 		
-		Collections.shuffle(possiblepairs);
-		int row = Integer.parseInt(possiblepairs.get(0).split(",")[0]);
-		int col = Integer.parseInt(possiblepairs.get(0).split(",")[1]);
+		Collections.shuffle(possiblePairs);
+		int row = Integer.parseInt(possiblePairs.get(0).split(",")[0]);
+		int col = Integer.parseInt(possiblePairs.get(0).split(",")[1]);
+		possiblePairs.remove(0);
 		String result = players[0].checkAttack(row, col);
 		if(result.equals(Player.ATTACK_HIT)) {
 			players[1].board.attack_grid[row][col] = Board.BOARD_HIT;

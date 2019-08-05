@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -49,7 +50,7 @@ public class Window {
 	public Board board;
 	public String[] playerShips;
 	
-	public static int DEV_TEST = 0;
+	public static int DEV_TEST = 1;
 	
 	/**
 	 * Function to create the file's new game menu item.
@@ -63,10 +64,28 @@ public class Window {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String player1 = "TestPlayer";
+				String player2 = "TestPlayer2";
+				
+				boolean multiplayer = true;
+				
+				if(DEV_TEST != 1) {
+					String isMulti = JOptionPane.showInputDialog("Please input game type: (1 - Single Player, Anything else for Multiplayer)");
+					if(isMulti.equals("1")) {
+						multiplayer = false;
+					}
+					else {
+						multiplayer = true;
+					}
+				}
+				
 				if(DEV_TEST != 1) {
 					player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
+					if(multiplayer == true) {
+						player2 = JOptionPane.showInputDialog("Please input name for player 2: ");
+					}
 				}
-				String strGameMode = "1";
+				
+				String strGameMode = "hj";
 				if(DEV_TEST != 1) {
 					strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
 				}
@@ -149,12 +168,18 @@ public class Window {
 			for(int j = 0; j < Board.BOARD_COLS; j++) {
 				if(shipPlacementGrid[i][j] == Board.PLACEMENT_BOARD_SHIP) {
 					lblShipPlacementGrid[i][j].setText("SHIP");
+					lblShipPlacementGrid[i][j].setBackground(Color.BLUE);
+					lblShipPlacementGrid[i][j].setOpaque(true);
 				}
 				else if(shipPlacementGrid[i][j] == Board.PLACEMENT_BOARD_SHIP_HIT) {
 					lblShipPlacementGrid[i][j].setText("*HIT");
+					lblShipPlacementGrid[i][j].setBackground(Color.GREEN);
+					lblShipPlacementGrid[i][j].setOpaque(true);
 				}
 				else {
 					lblShipPlacementGrid[i][j].setText("----");
+					lblShipPlacementGrid[i][j].setBackground(Color.WHITE);
+					lblShipPlacementGrid[i][j].setOpaque(true);
 				}
 			}
 		}
@@ -210,14 +235,20 @@ public class Window {
 							if(Game.gameMode == Game.GAME_TYPE_REGULAR) {
 								if(result.equals(Player.ATTACK_HIT)) {
 									lblAttackGrid[row][col].setText("*HIT");
+									lblAttackGrid[row][col].setBackground(Color.GREEN);
+									lblAttackGrid[row][col].setOpaque(true);
 								}
 								else {
 									lblAttackGrid[row][col].setText("MISS");
+									lblAttackGrid[row][col].setBackground(Color.WHITE);
+									lblAttackGrid[row][col].setOpaque(true);
 								}
 							}
 							else {
 								if(result.equals("Turn in process")) {
 									lblAttackGrid[row][col].setText("WAIT");
+									lblAttackGrid[row][col].setBackground(Color.ORANGE);
+									lblAttackGrid[row][col].setOpaque(true);
 								}
 								else {
 									String resuts[] = result.split(" ");
@@ -229,10 +260,14 @@ public class Window {
 										int tcol = Integer.parseInt(info[1]);
 										if(info[2].equals("missed")) {
 											lblAttackGrid[trow][tcol].setText("MISS");
+											lblAttackGrid[trow][tcol].setBackground(Color.WHITE);
+											lblAttackGrid[trow][tcol].setOpaque(true);
 											salvaResult += "missed ";
 										}
 										else {
 											lblAttackGrid[trow][tcol].setText("*HIT");
+											lblAttackGrid[trow][tcol].setBackground(Color.GREEN);
+											lblAttackGrid[trow][tcol].setOpaque(true);
 											salvaResult += "success ";
 										}
 									}
@@ -260,8 +295,12 @@ public class Window {
 					});
 					
 					JLabel lbl2 = new JLabel("-----");
+					lbl2.setBackground(Color.WHITE);
+					lbl2.setOpaque(true);
+					lbl2.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+					
 					lblShipPlacementGrid[i][j] = lbl2;
-					lblShipPlacementGrid[i][j].setBounds((70 * i), (70 * j), 200, 50);
+					lblShipPlacementGrid[i][j].setBounds((70 * i), (70 * j), 60, 50);
 					
 					f.add(lblAttackGrid[i][j]);
 					f.add(lblShipPlacementGrid[i][j]);
@@ -582,16 +621,16 @@ public class Window {
 		processShipPlacementVertically(0, 0, shipText);
 		
 		shipText = "SHIP#SHIP#SHIP#SHIP";
-		processShipPlacementVertically(1, 1, shipText);
+		processShipPlacementVertically(2, 1, shipText);
 		
 		shipText = "SHIP#SHIP#SHIP";
-		processShipPlacementVertically(2, 2, shipText);
+		processShipPlacementVertically(4, 2, shipText);
 		
 		shipText = "SHIP#SHIP#SHIP";
-		processShipPlacementVertically(3, 3, shipText);
+		processShipPlacementVertically(6, 3, shipText);
 		
 		shipText = "SHIP#SHIP";
-		processShipPlacementVertically(4, 4, shipText);
+		processShipPlacementVertically(8, 4, shipText);
 		
 		createGameAndPlayer(board);
 	}
