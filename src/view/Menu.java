@@ -7,6 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -37,7 +42,7 @@ public class Menu {
 				String player1 = "TestPlayer";
 				String player2 = "TestPlayer2";
 				
-				boolean multiplayer = false;
+				boolean multiplayer = true;
 				
 				if(Window.DEV_TEST != 1) {
 					String isMulti = JOptionPane.showInputDialog("Please input game type: (1 - Single Player, Anything else for Multiplayer)");
@@ -58,21 +63,48 @@ public class Menu {
 					}
 				}
 				
-				String strGameMode = "hj";
-				if(Window.DEV_TEST != 1) {
-					strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
-				}
-				int gameMode = Game.GAME_TYPE_REGULAR;
+				boolean gameCreating = false;
+				boolean gameJoining = false;
 				
-				if(strGameMode.equals("1")) {
-					gameMode = Game.GAME_TYPE_SALVA;
+				//if(Window.DEV_TEST != 1) {
+					String createJoinStr = JOptionPane.showInputDialog("Are you creating game or joining? (1 for Creation, Anything else for Joining)");
+					if(createJoinStr.equals("1")) {
+						gameCreating = true;
+					}
+					else {
+						gameJoining = true;
+					}
+				//}
+				
+				String strGameMode = "hj";
+				int gameMode = -1;
+				
+				if(multiplayer == false || (multiplayer == true && gameCreating == true)) {
+					if(Window.DEV_TEST != 1) {
+						strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
+					}
+					gameMode = Game.GAME_TYPE_REGULAR;
+					
+					if(strGameMode.equals("1")) {
+						gameMode = Game.GAME_TYPE_SALVA;
+					}
 				}
 				
 				if(multiplayer == false) {
 					win.gameController = new GameController(gameMode, player1);
 				}
 				else {
-					
+					if(gameCreating == true) {
+						multiplayerCreateGame();
+					}
+					else if(gameJoining == true) {
+						if(Window.DEV_TEST != 1) {
+							multiplayerJoinGame(player1);
+						}
+						else {
+							multiplayerJoinGame(player2);
+						}
+					}
 				}
 				
 				if(multiplayer == false) {
@@ -86,6 +118,48 @@ public class Menu {
 		return newGame;
 	}
 
+	public void multiplayerCreateGame() {
+		System.out.println("Game created at socket 4444. Waiting for players");
+		
+		try {
+			DatagramSocket socket = new DatagramSocket(4444);
+			byte[] buffer = new byte[65536];
+			
+			DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
+			socket.receive(incoming);
+			byte[] data = incoming.getData();
+			String recd_info = new String(data, 0, incoming.getLength());
+			System.out.println(recd_info);
+			System.out.println("Second player joined");
+			socket.close();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void multiplayerJoinGame(String playername) {
+		try {
+			DatagramSocket socket = new DatagramSocket(2222);
+			byte[] buffer = new byte[65536];
+			String to_send = playername;
+			buffer = to_send.getBytes();
+			DatagramPacket dp = new DatagramPacket(buffer, buffer.length , 
+					InetAddress.getByName("localhost"), 4444);
+			socket.send(dp);
+			socket.close();
+		}
+		catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public JMenuItem createSaveGameMenuItem() {
 		JMenuItem saveGame = new JMenuItem("Save Game");
 		saveGame.addActionListener(new ActionListener() {
