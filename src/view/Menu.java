@@ -43,14 +43,17 @@ public class Menu {
 				String player2 = "TestPlayer2";
 				
 				boolean multiplayer = true;
+				win.isMultiplayer = multiplayer;
 				
 				if(Window.DEV_TEST != 1) {
 					String isMulti = JOptionPane.showInputDialog("Please input game type: (1 - Single Player, Anything else for Multiplayer)");
 					if(isMulti.equals("1")) {
 						multiplayer = false;
+						win.isMultiplayer = false;
 					}
 					else {
 						multiplayer = true;
+						win.isMultiplayer = true;
 					}
 				}
 				
@@ -95,14 +98,29 @@ public class Menu {
 				}
 				else {
 					if(gameCreating == true) {
-						multiplayerCreateGame();
+						String other_player_name = multiplayerCreateGame(player1, gameMode);
+						win.gameController = new GameController(gameMode, player1, other_player_name, true);
+						win.createBoardDisplay(win.gameFrame);
+						win.tmpPlayerName = player1;
+						win.gameFrame.revalidate();
 					}
 					else if(gameJoining == true) {
 						if(Window.DEV_TEST != 1) {
-							multiplayerJoinGame(player1);
+							String other_player_name = multiplayerJoinGame(player1);
+							win.gameController = new GameController(Integer.parseInt(other_player_name.split("_")[1]), 
+									other_player_name.split("_")[0], player1, false);
+							win.createBoardDisplay(win.gameFrame);
+							win.tmpPlayerName = player1;
+							win.gameFrame.revalidate();
 						}
 						else {
-							multiplayerJoinGame(player2);
+							String other_player_name = multiplayerJoinGame(player2);
+							win.gameController = new GameController(Integer.parseInt(other_player_name.split("_")[1]), 
+									other_player_name.split("_")[0], player2, false);
+							
+							win.createBoardDisplay(win.gameFrame);
+							win.tmpPlayerName = player1;
+							win.gameFrame.revalidate();
 						}
 					}
 				}
@@ -118,7 +136,7 @@ public class Menu {
 		return newGame;
 	}
 
-	public void multiplayerCreateGame() {
+	public String multiplayerCreateGame(String playerName, int gameMode) {
 		System.out.println("Game created at socket 4444. Waiting for players");
 		
 		try {
@@ -129,17 +147,26 @@ public class Menu {
 			socket.receive(incoming);
 			byte[] data = incoming.getData();
 			String recd_info = new String(data, 0, incoming.getLength());
-			System.out.println(recd_info);
-			System.out.println("Second player joined");
+			
+			buffer = new byte[65536];
+			String to_send = playerName + "_" + gameMode;
+			buffer = to_send.getBytes();
+			DatagramPacket dp = new DatagramPacket(buffer, buffer.length , 
+					incoming.getAddress(), incoming.getPort());
+			socket.send(dp);
+			
 			socket.close();
+			return recd_info;
+			
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	public void multiplayerJoinGame(String playername) {
+	public String multiplayerJoinGame(String playername) {
 		try {
 			DatagramSocket socket = new DatagramSocket(2222);
 			byte[] buffer = new byte[65536];
@@ -148,16 +175,24 @@ public class Menu {
 			DatagramPacket dp = new DatagramPacket(buffer, buffer.length , 
 					InetAddress.getByName("localhost"), 4444);
 			socket.send(dp);
+			
+			buffer = new byte[65536];
+			DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
+			socket.receive(incoming);
+			byte[] data = incoming.getData();
+			String recd_info = new String(data, 0, incoming.getLength());
+			
 			socket.close();
+			return recd_info;
 		}
 		catch (SocketException e) {
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	public JMenuItem createSaveGameMenuItem() {

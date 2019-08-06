@@ -23,6 +23,7 @@ public class GameController implements Serializable {
 	public int gameMode;
 	String player1Name;
 	String player2Name;
+	boolean creator;
 	
 	/**
 	 * The parameterized constructor.
@@ -33,10 +34,11 @@ public class GameController implements Serializable {
 		this.player1Name = player1Name;
 	}
 	
-	public GameController(int gameMode, String player1Name, String player2Name) {
+	public GameController(int gameMode, String player1Name, String player2Name, Boolean creator) {
 		this.gameMode = gameMode;
 		this.player1Name = player1Name;
 		this.player2Name = player2Name;
+		this.creator = creator;
 	}
 	
 	/**
@@ -51,6 +53,15 @@ public class GameController implements Serializable {
 		}
 		else {
 			game = new Game(this.player1Name, board, gameMode, playerShips, this.player2Name, player2board, player2Ships);
+		}
+	}
+	
+	public void createMultiplayerGame(Board board, String[] playerShips) {
+		if(creator == true) {
+			System.out.println("Game Created By: " + this.player1Name);
+		}
+		else {
+			System.out.println("Game Joined By: " + this.player2Name);
 		}
 	}
 	
