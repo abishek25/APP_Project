@@ -34,7 +34,7 @@ class BattleShipTests {
 			}
 		}
 		
-		win.gameController = new GameController(1);
+		win.gameController = new GameController(1, "TestPlayer");
 		win.board = new Board();
 		win.playerShips = new String[5];
 		Window.DEV_TEST = 5;

@@ -7,6 +7,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -26,9 +38,11 @@ import model.Player;
 /**
  * This class represents the view of the game.
  */
-public class Window {
+public class Window implements Serializable {
 	
-	JFrame gameFrame; 
+	private static final long serialVersionUID = 1L;
+	
+	JFrame gameFrame;
 	public GameController gameController;
 	public JButton[][] lblAttackGrid;
 	public JLabel[][] lblShipPlacementGrid;
@@ -50,61 +64,14 @@ public class Window {
 	public Board board;
 	public String[] playerShips;
 	
+	boolean isMultiplayer;
+	
 	public static int DEV_TEST = 1;
+	String networkPlayerName;
 	
-	/**
-	 * Function to create the file's new game menu item.
-	 * @return newGame The menu item.
-	 */
-	public JMenuItem createNewGameMenuItem() {
-		JMenuItem newGame = new JMenuItem("New Game");
-		
-		newGame.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String player1 = "TestPlayer";
-				String player2 = "TestPlayer2";
-				
-				boolean multiplayer = true;
-				
-				if(DEV_TEST != 1) {
-					String isMulti = JOptionPane.showInputDialog("Please input game type: (1 - Single Player, Anything else for Multiplayer)");
-					if(isMulti.equals("1")) {
-						multiplayer = false;
-					}
-					else {
-						multiplayer = true;
-					}
-				}
-				
-				if(DEV_TEST != 1) {
-					player1 = JOptionPane.showInputDialog("Please input name for player 1: ");
-					if(multiplayer == true) {
-						player2 = JOptionPane.showInputDialog("Please input name for player 2: ");
-					}
-				}
-				
-				String strGameMode = "hj";
-				if(DEV_TEST != 1) {
-					strGameMode = JOptionPane.showInputDialog("Please input game mode: (1 - Salva, Anything else for Regular)");
-				}
-				int gameMode = Game.GAME_TYPE_REGULAR;
-				
-				if(strGameMode.equals("1")) {
-					gameMode = Game.GAME_TYPE_SALVA;
-				}
-				
-				gameController = new GameController(gameMode);
-				createBoardDisplay(gameFrame);
-				tmpPlayerName = player1;
-				gameFrame.revalidate();
-			}
-		});
-		
-		return newGame;
-	}
+	static int multiplayerPort = 4444;
 	
+
 	/**
 	 * Function creates the game with placed ship and updates the board.
 	 * @param board The game board
@@ -114,7 +81,7 @@ public class Window {
 			return;
 		}
 		
-		gameController.createGame(tmpPlayerName, board, playerShips);
+		gameController.createGame(tmpPlayerName, board, playerShips, null, null);
 		
 		turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
 		turnLabel.setBounds(0, 600, 300, 50);
@@ -137,25 +104,32 @@ public class Window {
 		JOptionPane.showMessageDialog(null, "Game Begins");
 	}
 	
-	/**
-	 * Function to create file menu
-	 * @return The File menu
-	 */
-	public JMenu createFileMenu() {
-		JMenu file = new JMenu("File");
-		file.add(createNewGameMenuItem());
-		return file;
+	public void createMultiGameAndPlayer(Board board) {
+		if(gameFrame == null) {
+			return;
+		}
+		
+		turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
+		turnLabel.setBounds(0, 600, 300, 50);
+		gameFrame.add(turnLabel);
+		
+		resultLabel = new JLabel("");
+		resultLabel.setBounds(0, 680, 900, 50);
+		gameFrame.add(resultLabel);
+		
+		scores = new JLabel("");
+		scores.setBounds(0, 710, 900, 50);
+		gameFrame.add(scores);
+		
+		gameStatus = new JLabel("Game in progress");
+		gameStatus.setBounds(0, 750, 300, 50);
+		gameFrame.add(gameStatus);
+		
+		gameFrame.revalidate();
+		refreshBoard();
+		JOptionPane.showMessageDialog(null, "Game Begins");
 	}
 	
-	/**
-	 * Function to create menu bar
-	 * @return The menu bar
-	 */
-	public JMenuBar createMenu() {
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(createFileMenu());
-		return menuBar;
-	}
 	
 	/**
 	 * Function to update the board display after any movement/attack.
@@ -224,75 +198,7 @@ public class Window {
 					lblAttackGrid[i][j] = btn;
 					lblAttackGrid[i][j].setBounds(800 + (70 * i), (70 * j), 70, 70);
 
-					lblAttackGrid[i][j].addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							String cmd = e.getActionCommand();
-							int row = cmd.charAt(0) - 65;
-							int col = Integer.parseInt(cmd.substring(1)) - 1;
-							String result = processCommand(row, col);
-							System.out.println("Window received result: " + result);
-							if(Game.gameMode == Game.GAME_TYPE_REGULAR) {
-								if(result.equals(Player.ATTACK_HIT)) {
-									lblAttackGrid[row][col].setText("*HIT");
-									lblAttackGrid[row][col].setBackground(Color.GREEN);
-									lblAttackGrid[row][col].setOpaque(true);
-								}
-								else {
-									lblAttackGrid[row][col].setText("MISS");
-									lblAttackGrid[row][col].setBackground(Color.WHITE);
-									lblAttackGrid[row][col].setOpaque(true);
-								}
-							}
-							else {
-								if(result.equals("Turn in process")) {
-									lblAttackGrid[row][col].setText("WAIT");
-									lblAttackGrid[row][col].setBackground(Color.ORANGE);
-									lblAttackGrid[row][col].setOpaque(true);
-								}
-								else {
-									String resuts[] = result.split(" ");
-									String salvaResult = "";
-									
-									for(int i = 0; i < resuts.length; i++) {
-										String info[] = resuts[i].split("#");
-										int trow = Integer.parseInt(info[0]);
-										int tcol = Integer.parseInt(info[1]);
-										if(info[2].equals("missed")) {
-											lblAttackGrid[trow][tcol].setText("MISS");
-											lblAttackGrid[trow][tcol].setBackground(Color.WHITE);
-											lblAttackGrid[trow][tcol].setOpaque(true);
-											salvaResult += "missed ";
-										}
-										else {
-											lblAttackGrid[trow][tcol].setText("*HIT");
-											lblAttackGrid[trow][tcol].setBackground(Color.GREEN);
-											lblAttackGrid[trow][tcol].setOpaque(true);
-											salvaResult += "success ";
-										}
-									}
-									
-									result = salvaResult;
-								}
-							}
-							
-							lblAttackGrid[row][col].setEnabled(false);
-							result = "Prev Turn Result: " + result;
-							resultLabel.setText(result);
-							
-							scores.setText(Game.gameScores);
-							
-							if(Game.checkIfGameWon() == true) {
-								gameStatus.setText("Game Over. Winner is " + Game.getWinner());
-								JOptionPane.showMessageDialog(null, 
-										Game.getWinner() + " won the game. Scores: " + 
-												tmpPlayerName + "(" + gameController.getP1Score() + ")" +
-												" AND AI (" + gameController.getAIScore() + ")", 
-										"Game Over", JOptionPane.INFORMATION_MESSAGE);
-								System.exit(0);
-							}
-						}
-					});
+					lblAttackGrid[i][j].addActionListener(new attackListener());
 					
 					JLabel lbl2 = new JLabel("-----");
 					lbl2.setBackground(Color.WHITE);
@@ -337,26 +243,6 @@ public class Window {
 		}
 	}
 
-	/**
-	 * This function generates the java frame.
-	 */
-	public void initMainFrame() {
-		JFrame.setDefaultLookAndFeelDecorated(true);
-	    gameFrame = new JFrame("BattleShip");
-	    gameFrame.setLayout(null);
-	    gameFrame.setSize(1600,900);
-	    gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    gameFrame.setJMenuBar(createMenu());
-	    gameFrame.setVisible(true);
-	    playerShips = new String[5];
-	}
-	
-	/**
-	 * Function to start everything
-	 */
-	public void start() {
-		initMainFrame();
-	}
 	
 	/**
 	 * Function to check whether ship is placed inside the board or not. 
@@ -604,14 +490,6 @@ public class Window {
 		return true;
 	}
 	
-	/**
-	 * The main function called by OS
-	 * @param args The command line argumeents
-	 */
-	public static void main(String[] args) {
-		Window win = new Window();
-		win.start();
-	}
 	
 	/**
 	 * The function places the ships for testing function.
@@ -638,7 +516,7 @@ public class Window {
 	/**
 	 * Listeners for the ship(JLabel).
 	 */
-	MouseListener lblDnd = new MouseListener() {
+	transient MouseListener lblDnd = new MouseListener() {
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			
@@ -692,10 +570,18 @@ public class Window {
 			}
 			
 			toMoveShip = null;
-
-			if(numShipsPlaced == 5) {
-				System.out.println("All Ships placed. Game starts now");
-				createGameAndPlayer(board);
+			
+			if(isMultiplayer == false) {
+				if(numShipsPlaced == 5) {
+					System.out.println("All Ships placed. Game starts now");
+					createGameAndPlayer(board);
+				}
+			}
+			else {
+				if(numShipsPlaced == 5) {
+					System.out.println("All Ships placed. Game starts now");
+					createMultiGameAndPlayer(board);
+				}
 			}
 		}
 		
@@ -711,4 +597,78 @@ public class Window {
 		@Override public void mouseClicked(MouseEvent e) {}
 	};
 	
+	class attackListener implements ActionListener, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			String cmd = e.getActionCommand();
+			int row = cmd.charAt(0) - 65;
+			int col = Integer.parseInt(cmd.substring(1)) - 1;
+			String result = processCommand(row, col);
+			System.out.println("Window received result: " + result);
+			if(gameController.getGameTypeMode() == Game.GAME_TYPE_REGULAR) {
+				if(result.equals(Player.ATTACK_HIT)) {
+					lblAttackGrid[row][col].setText("*HIT");
+					lblAttackGrid[row][col].setBackground(Color.GREEN);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+				else {
+					lblAttackGrid[row][col].setText("MISS");
+					lblAttackGrid[row][col].setBackground(Color.WHITE);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+			}
+			else {
+				if(result.equals("Turn in process")) {
+					lblAttackGrid[row][col].setText("WAIT");
+					lblAttackGrid[row][col].setBackground(Color.ORANGE);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+				else {
+					String resuts[] = result.split(" ");
+					String salvaResult = "";
+					
+					for(int i = 0; i < resuts.length; i++) {
+						String info[] = resuts[i].split("#");
+						int trow = Integer.parseInt(info[0]);
+						int tcol = Integer.parseInt(info[1]);
+						if(info[2].equals("missed")) {
+							lblAttackGrid[trow][tcol].setText("MISS");
+							lblAttackGrid[trow][tcol].setBackground(Color.WHITE);
+							lblAttackGrid[trow][tcol].setOpaque(true);
+							salvaResult += "missed ";
+						}
+						else {
+							lblAttackGrid[trow][tcol].setText("*HIT");
+							lblAttackGrid[trow][tcol].setBackground(Color.GREEN);
+							lblAttackGrid[trow][tcol].setOpaque(true);
+							salvaResult += "success ";
+						}
+					}
+					
+					result = salvaResult;
+				}
+			}
+			
+			lblAttackGrid[row][col].setEnabled(false);
+			result = "Prev Turn Result: " + result;
+			resultLabel.setText(result);
+			
+			scores.setText(Game.gameScores);
+			
+			if(Game.checkIfGameWon() == true) {
+				gameStatus.setText("Game Over. Winner is " + Game.getWinner());
+				JOptionPane.showMessageDialog(null, 
+						Game.getWinner() + " won the game. Scores: " + 
+								tmpPlayerName + "(" + gameController.getP1Score() + ")" +
+								" AND AI (" + gameController.getAIScore() + ")", 
+						"Game Over", JOptionPane.INFORMATION_MESSAGE);
+				System.exit(0);
+			}
+		}
+		
+	}
 }

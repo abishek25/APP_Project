@@ -1,11 +1,14 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * This class is used to hold information about the player
  *
  */
-public class Player {
+public class Player implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	public static String ATTACK_HIT = "Attack was success";
 	public static String ATTACK_MISS = "Attack was missed";
 	

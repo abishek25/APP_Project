@@ -1,10 +1,13 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * This class is used to hold information about the ship
  *
  */
-public class Ship {
+public class Ship implements Serializable {
+	private static final long serialVersionUID = 1L;
 	String name;
 	public boolean holes[];
 	public String unfilledHoles[];

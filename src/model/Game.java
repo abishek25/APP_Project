@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -7,7 +8,9 @@ import java.util.Random;
 /**
  * This class is used to hold information about the game in progress.
  */
-public class Game {
+public class Game implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public static int GAME_MODE_AI = 1;
 	public static int GAME_MODE_NETWORK = 2;
@@ -21,7 +24,7 @@ public class Game {
 	
 	public Player[] players;
 	int mode;
-	public static int gameMode;
+	public int gameMode;
 	
 	public static ArrayList<String> salvaAttackRes;
 	
@@ -29,10 +32,10 @@ public class Game {
 	public static boolean isFinished;
 	static String winnerName;
 	
-	static int prevAIAttackResult;
-	static int prevAIAttackRow;
-	static int prevAIAttackCol;
-	static ArrayList<String> possiblePairs;
+	int prevAIAttackResult;
+	int prevAIAttackRow;
+	int prevAIAttackCol;
+	ArrayList<String> possiblePairs;
 	
 	public Integer playerTurnTimer;
 	
@@ -177,13 +180,16 @@ public class Game {
 	 * @param playerTwoName Player 2 name
 	 * @param player2Positions Player 2 positions
 	 */
-	public Game(String playerOneName, String player1Positions, String playerTwoName, String player2Positions) {
+	public Game(String playerOneName, Board board, int gameMode, String[] playerShips, String playerTwoName, Board board2, String[] player2Ships) {
 		players = new Player[2];
-		players[0] = new Player(playerOneName, player1Positions);
-		players[1] = new Player(playerTwoName, player2Positions);
+		players[0] = new Player(playerOneName, board, playerShips);
+		players[1] = new Player(playerTwoName, board2, player2Ships);
 		mode = GAME_MODE_NETWORK;
+		this.gameMode = gameMode;
 		currPlayer = 0;
+		isFinished = false;
 		salvaAttackRes = new ArrayList<String>();
+		possiblePairs = new ArrayList<String>();
 		playerOneScore = 0;
 		playerTwoScore = 0;
 		playerTurnTimer = 0;
@@ -497,10 +503,10 @@ public class Game {
 	public String processAttack(int row, int col) {
 		String result = "";
 		if(getGameMode() == GAME_MODE_AI) {
-			if(Game.gameMode == Game.GAME_TYPE_REGULAR) {
+			if(this.gameMode == Game.GAME_TYPE_REGULAR) {
 				result = regularAttack(row, col);
 			}
-			else if(Game.gameMode == Game.GAME_TYPE_SALVA) {
+			else if(this.gameMode == Game.GAME_TYPE_SALVA) {
 				result = salvaAttack(row, col);
 			}
 		}
@@ -537,7 +543,7 @@ public class Game {
 	/**
 	 * The thread to keep track of turn time
 	 */
-	public Thread timer = new Thread() {
+	public transient Thread timer = new Thread() {
 		public void run() {
 			while(true) {
 				try {
@@ -569,5 +575,9 @@ public class Game {
 	 */
 	public int getPlayerTwoResults() {
 		return playerTwoScore;
+	}
+	
+	public int getGameTypeMode() {
+		return gameMode;
 	}
 }

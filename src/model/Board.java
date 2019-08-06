@@ -1,11 +1,14 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * This class is the model for boards
  * Ship placement and Attack Board.
  */
-public class Board {
-	
+public class Board implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	public static int BOARD_EMPTY = 0;
 	public static int BOARD_MISS = 1;
 	public static int BOARD_HIT = 2;
