@@ -59,9 +59,11 @@ public class GameController implements Serializable {
 	public void createMultiplayerGame(Board board, String[] playerShips) {
 		if(creator == true) {
 			System.out.println("Game Created By: " + this.player1Name);
+			game = new Game(player1Name, board, gameMode, playerShips, player2Name, true);
 		}
 		else {
 			System.out.println("Game Joined By: " + this.player2Name);
+			game = new Game(player2Name, board, gameMode, playerShips, player1Name, false);
 		}
 	}
 	
@@ -79,6 +81,10 @@ public class GameController implements Serializable {
 	 */
 	public Player getCurrPlayer() {
 		return game.getCurrPlayer();
+	}
+	
+	public String multiplayerGetCurrPlayerName() {
+		return game.multiplayerGetCurrPlayerName();
 	}
 	
 	/**

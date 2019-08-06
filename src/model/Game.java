@@ -44,6 +44,8 @@ public class Game implements Serializable {
 	
 	public static String gameScores;
 	
+	public String multiplayerCurrentPlayerName;
+	
 	/**
 	 * This function checks positions passed for placement of ship
 	 * @param positions of ship
@@ -196,6 +198,27 @@ public class Game implements Serializable {
 		timer.start();
 	}
 	
+	public Game(String playerName, Board board, int gameMode, String[] playerShips, String otherPlayerName, boolean creator) {
+		players = new Player[1];
+		players[0] = new Player(playerName, board, playerShips);
+		mode = GAME_MODE_NETWORK;
+		this.gameMode = gameMode;
+		if(creator == true) {
+			this.multiplayerCurrentPlayerName = playerName;
+		}
+		else {
+			this.multiplayerCurrentPlayerName = otherPlayerName;
+		}
+		
+		isFinished = false;
+		salvaAttackRes = new ArrayList<String>();
+		possiblePairs = new ArrayList<String>();
+		playerOneScore = 0;
+		playerTwoScore = 0;
+		playerTurnTimer = 0;
+		timer.start();
+	}
+	
 	/**
 	 * Function to get game mode
 	 * @return The game mode
@@ -229,6 +252,10 @@ public class Game implements Serializable {
 	 */
 	public Player getCurrPlayer() {
 		return this.players[currPlayer];
+	}
+	
+	public String multiplayerGetCurrPlayerName() {
+		return this.multiplayerCurrentPlayerName;
 	}
 	
 	/**

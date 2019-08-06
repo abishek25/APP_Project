@@ -111,7 +111,7 @@ public class Window implements Serializable {
 		
 		gameController.createMultiplayerGame(board, playerShips);
 		
-		turnLabel = new JLabel("Current Turn: " + gameController.getCurrPlayer().getName());
+		turnLabel = new JLabel("Current Turn: " + gameController.multiplayerGetCurrPlayerName());
 		turnLabel.setBounds(0, 600, 300, 50);
 		gameFrame.add(turnLabel);
 		
@@ -240,7 +240,7 @@ public class Window implements Serializable {
 		f.add(placeShip4);
 		f.add(placeShip5);
 		
-		if(DEV_TEST == 1 && isMultiplayer == false) {
+		if(DEV_TEST == 1) {// && isMultiplayer == false) {
 			autoShipPlacementForTesting();
 		}
 	}
@@ -512,7 +512,12 @@ public class Window implements Serializable {
 		shipText = "SHIP#SHIP";
 		processShipPlacementVertically(8, 4, shipText);
 		
-		createGameAndPlayer(board);
+		if(isMultiplayer == false) {
+			createGameAndPlayer(board);
+		}
+		else {
+			createMultiGameAndPlayer(board);
+		}
 	}
 
 	/**
