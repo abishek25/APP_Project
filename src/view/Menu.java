@@ -25,6 +25,12 @@ import model.Game;
 
 public class Menu {
 	
+	public static int PORT_CREATOR = 4444;
+	public static int PORT_JOINER = 2222;
+	
+	public static String ADDR_CREATOR = "localhost";
+	public static String ADDR_JOINER = "localhost";
+	
 	Window win;
 	String SAVE_GAME_PATH = "F:\\savedgame\\";
 
@@ -140,7 +146,7 @@ public class Menu {
 		System.out.println("Game created at socket 4444. Waiting for players");
 		
 		try {
-			DatagramSocket socket = new DatagramSocket(4444);
+			DatagramSocket socket = new DatagramSocket(PORT_CREATOR);
 			byte[] buffer = new byte[65536];
 			
 			DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
@@ -168,12 +174,12 @@ public class Menu {
 	
 	public String multiplayerJoinGame(String playername) {
 		try {
-			DatagramSocket socket = new DatagramSocket(2222);
+			DatagramSocket socket = new DatagramSocket(PORT_JOINER);
 			byte[] buffer = new byte[65536];
 			String to_send = playername;
 			buffer = to_send.getBytes();
 			DatagramPacket dp = new DatagramPacket(buffer, buffer.length , 
-					InetAddress.getByName("localhost"), 4444);
+					InetAddress.getByName(ADDR_CREATOR), PORT_CREATOR);
 			socket.send(dp);
 			
 			buffer = new byte[65536];

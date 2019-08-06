@@ -1,6 +1,11 @@
 package model;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -45,6 +50,11 @@ public class Game implements Serializable {
 	public static String gameScores;
 	
 	public String multiplayerCurrentPlayerName;
+	public String otherPlayerName;
+	public int otherPlayerPort;
+	public String otherPlayerAddr;
+	public int ownPort;
+	public String ownAddr;
 	
 	/**
 	 * This function checks positions passed for placement of ship
@@ -198,16 +208,19 @@ public class Game implements Serializable {
 		timer.start();
 	}
 	
-	public Game(String playerName, Board board, int gameMode, String[] playerShips, String otherPlayerName, boolean creator) {
+	public Game(String playerName, Board board, int gameMode, String[] playerShips, String otherPlayerName, 
+			boolean creator, int otherPort, String otherPlayerAddr, int ownPort, String ownAddr) {
 		players = new Player[1];
 		players[0] = new Player(playerName, board, playerShips);
 		mode = GAME_MODE_NETWORK;
 		this.gameMode = gameMode;
 		if(creator == true) {
 			this.multiplayerCurrentPlayerName = playerName;
+			this.otherPlayerName = otherPlayerName;
 		}
 		else {
 			this.multiplayerCurrentPlayerName = otherPlayerName;
+			this.otherPlayerName = playerName;
 		}
 		
 		isFinished = false;
@@ -216,6 +229,10 @@ public class Game implements Serializable {
 		playerOneScore = 0;
 		playerTwoScore = 0;
 		playerTurnTimer = 0;
+		this.otherPlayerPort = otherPort;
+		this.otherPlayerAddr = otherPlayerAddr;
+		this.ownPort = ownPort;
+		this.ownAddr = ownAddr;
 		timer.start();
 	}
 	
@@ -441,6 +458,52 @@ public class Game implements Serializable {
 		return result;
 	}
 	
+	public String multiCheckAttack(int row, int col) {
+		try {
+			System.out.println("Connecting to socket at " + (this.ownPort + 1));
+			DatagramSocket socket = new DatagramSocket(this.ownPort + 1);
+			byte[] buffer = new byte[65536];
+			
+			String to_send = "ATTACK_" + row + "_" + col + "_";
+			buffer = to_send.getBytes();
+			DatagramPacket dp = new DatagramPacket(buffer, buffer.length, 
+					InetAddress.getByName(this.otherPlayerAddr), this.otherPlayerPort);
+			socket.send(dp);
+			
+			buffer = new byte[65536];
+			DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
+			socket.receive(incoming);
+			byte[] data = incoming.getData();
+			String recd_info = new String(data, 0, incoming.getLength());
+			
+			socket.close();
+			return recd_info;
+			
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String multiRegularAttack(int row, int col) {
+		String result = multiCheckAttack(row, col);
+		
+		System.out.println("Player Attack Result For (" + row + "," + col + "): " + result);
+		processRegularAttackResult(row, col, result);
+		resetPlayerTimer();
+		
+		if(isFinished == true) {
+			winnerName = this.multiplayerCurrentPlayerName;
+		}
+		else {
+			this.multiplayerCurrentPlayerName = this.otherPlayerName;
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * The function to handle the successful attack immediately for salva game alongwith score.
 	 * @param row The row co-ordinate
@@ -521,6 +584,40 @@ public class Game implements Serializable {
 		}
 	}
 	
+	public String multiSalvaAttack(int row, int col) {
+		String result = multiCheckAttack(row, col);
+		if(result.equals(Player.ATTACK_HIT)) {
+			processSalvaAttackHit(row, col, players[0].board.attack_grid);
+		}
+		else {
+			processSalvaAttackMiss(row, col, players[0].board.attack_grid);
+		}
+		salvaAttackRes.add(row + "#" + col + "#" + result.substring(11));
+		
+		if(salvaAttackRes.size() == players[0].numShipsAlive) {
+			String results = "";
+			
+			for(int i = 0; i < players[0].numShipsAlive; i++) {
+				results += salvaAttackRes.get(i) + " ";
+			}
+			
+			salvaAttackRes.clear();
+			updateGameStatus(players[1].board);
+			
+			if(isFinished == true) {
+				winnerName = this.multiplayerCurrentPlayerName;
+			}
+			else {
+				this.multiplayerCurrentPlayerName = this.otherPlayerName;
+			}
+			
+			return results;
+		}
+		else {
+			return "Turn in process";
+		}
+	}
+	
 	/**
 	 * Function to processes the attack based on game mode.
 	 * @param row The input row
@@ -546,6 +643,23 @@ public class Game implements Serializable {
 				result = players[0].checkAttack(row, col);
 				currPlayer = 0;
 			}
+		}
+		
+		return result;
+	}
+	
+	public String processMultiAttack(int row, int col) {
+		String result = "";
+		
+		if(multiplayerCurrentPlayerName.equals(players[0].getName()) == false) {
+			return result;
+		}
+		
+		if(this.gameMode == Game.GAME_TYPE_REGULAR) {
+			result = multiRegularAttack(row, col);
+		}
+		else if(this.gameMode == Game.GAME_TYPE_SALVA) {
+			result = multiSalvaAttack(row, col);
 		}
 		
 		return result;
@@ -606,5 +720,36 @@ public class Game implements Serializable {
 	
 	public int getGameTypeMode() {
 		return gameMode;
+	}
+	
+	public boolean checkIfOpponentTurn() {
+		if(multiplayerCurrentPlayerName.equals(players[0].name) == true) {
+			return false;
+		}
+		return true;
+	}
+	
+	public int getOtherPlayerPort() {
+		return otherPlayerPort;
+	}
+	
+	public String getOtherPlayerAddr() {
+		return otherPlayerAddr;
+	}
+	
+	public int getOwnPort() {
+		return this.ownPort;
+	}
+	
+	public String getOwnAddr() {
+		return this.ownAddr;
+	}
+	
+	public String processIncomingAttack(int row, int col) {
+		System.out.println("Processing incoming attack at " + players[0].getName());
+		String result = players[0].checkAttack(row, col);
+		updateGameStatus(players[0].getBoard());
+		this.multiplayerCurrentPlayerName = players[0].getName();
+		return result;
 	}
 }

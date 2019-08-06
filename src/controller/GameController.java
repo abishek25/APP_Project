@@ -10,6 +10,7 @@ import java.io.Serializable;
 import model.Board;
 import model.Game;
 import model.Player;
+import view.Menu;
 
 /**
  * This class is used to handle events received from view
@@ -59,11 +60,13 @@ public class GameController implements Serializable {
 	public void createMultiplayerGame(Board board, String[] playerShips) {
 		if(creator == true) {
 			System.out.println("Game Created By: " + this.player1Name);
-			game = new Game(player1Name, board, gameMode, playerShips, player2Name, true);
+			game = new Game(player1Name, board, gameMode, playerShips, player2Name, true, 
+					Menu.PORT_JOINER, Menu.ADDR_JOINER, Menu.PORT_CREATOR, Menu.ADDR_CREATOR);
 		}
 		else {
 			System.out.println("Game Joined By: " + this.player2Name);
-			game = new Game(player2Name, board, gameMode, playerShips, player1Name, false);
+			game = new Game(player2Name, board, gameMode, playerShips, player1Name, false, 
+					Menu.PORT_CREATOR, Menu.ADDR_CREATOR, Menu.PORT_JOINER, Menu.ADDR_JOINER);
 		}
 	}
 	
@@ -97,6 +100,10 @@ public class GameController implements Serializable {
 		return game.processAttack(row, col);
 	}
 	
+	public String processMultiAttack(int row, int col) {
+		return game.processMultiAttack(row, col);
+	}
+	
 	/**
 	 * Function get player 1 score
 	 * @return Player 1 score
@@ -115,5 +122,29 @@ public class GameController implements Serializable {
 	
 	public int getGameTypeMode() {
 		return game.getGameTypeMode();
+	}
+	
+	public boolean checkIfOpponentTurn() {
+		return game.checkIfOpponentTurn();
+	}
+	
+	public int getOtherPlayerPort() {
+		return game.otherPlayerPort;
+	}
+	
+	public String getOtherPlayerAddr() {
+		return game.otherPlayerAddr;
+	}
+	
+	public int getOwnPort() {
+		return game.ownPort;
+	}
+	
+	public String getOwnAddr() {
+		return game.ownAddr;
+	}
+	
+	public String processIncomingAttack(int row, int col) {
+		return game.processIncomingAttack(row, col);
 	}
 }

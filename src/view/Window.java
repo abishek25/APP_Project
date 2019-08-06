@@ -130,6 +130,7 @@ public class Window implements Serializable {
 		gameFrame.revalidate();
 		refreshBoard();
 		JOptionPane.showMessageDialog(null, "Game Begins");
+		receiveAttack.start();
 	}
 	
 	
@@ -168,7 +169,13 @@ public class Window implements Serializable {
 	 * @return The attack result
 	 */
 	public String processCommand(int row, int col) {
-		String result = gameController.processAttack(row, col);
+		String result;
+		if(isMultiplayer == false) {
+			result = gameController.processAttack(row, col);
+		}
+		else {
+			result = gameController.processMultiAttack(row, col);
+		}
 		refreshBoard();
 		return result;
 	}
@@ -199,8 +206,13 @@ public class Window implements Serializable {
 					JButton btn = new JButton(("" + (char)(65 + i)) + (j + 1));
 					lblAttackGrid[i][j] = btn;
 					lblAttackGrid[i][j].setBounds(800 + (70 * i), (70 * j), 70, 70);
-
-					lblAttackGrid[i][j].addActionListener(new attackListener());
+					
+					if(isMultiplayer == false) {
+						lblAttackGrid[i][j].addActionListener(new attackListener());
+					}
+					else {
+						lblAttackGrid[i][j].addActionListener(new multiAttackListener());
+					}
 					
 					JLabel lbl2 = new JLabel("-----");
 					lbl2.setBackground(Color.WHITE);
@@ -677,5 +689,121 @@ public class Window implements Serializable {
 			}
 		}
 		
+	}
+	
+	Thread receiveAttack = new Thread() {
+		public void run() {
+			while(true) {
+				try {
+					DatagramSocket socket = new DatagramSocket(gameController.getOwnPort());
+					byte[] buffer = new byte[65536];
+					
+					DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
+					socket.receive(incoming);
+					System.out.println("Received Attack");
+					byte[] data = incoming.getData();
+					String recd_info = new String(data, 0, incoming.getLength());
+					String recd_info_arr[] = recd_info.split("_");
+					if(recd_info_arr[0].equals("ATTACK")) {
+						int row = Integer.parseInt(recd_info_arr[1]);
+						int col = Integer.parseInt(recd_info_arr[2]);
+						String result = gameController.processIncomingAttack(row, col);
+						
+						buffer = new byte[65536];
+						String to_send = result;
+						buffer = to_send.getBytes();
+						DatagramPacket dp = new DatagramPacket(buffer, buffer.length, 
+								incoming.getAddress(), incoming.getPort());
+						socket.send(dp);
+						
+						socket.close();
+						refreshBoard();
+					}
+					
+				} catch (SocketException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	};
+	
+	class multiAttackListener implements ActionListener, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String cmd = e.getActionCommand();
+			int row = cmd.charAt(0) - 65;
+			int col = Integer.parseInt(cmd.substring(1)) - 1;
+			
+			String result = processCommand(row, col);
+			if(result.length() < 2) {
+				return;
+			}
+			System.out.println("Window received result: " + result);
+			
+			if(gameController.getGameTypeMode() == Game.GAME_TYPE_REGULAR) {
+				if(result.equals(Player.ATTACK_HIT)) {
+					lblAttackGrid[row][col].setText("*HIT");
+					lblAttackGrid[row][col].setBackground(Color.GREEN);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+				else {
+					lblAttackGrid[row][col].setText("MISS");
+					lblAttackGrid[row][col].setBackground(Color.WHITE);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+			}
+			else {
+				if(result.equals("Turn in process")) {
+					lblAttackGrid[row][col].setText("WAIT");
+					lblAttackGrid[row][col].setBackground(Color.ORANGE);
+					lblAttackGrid[row][col].setOpaque(true);
+				}
+				else {
+					String resuts[] = result.split(" ");
+					String salvaResult = "";
+					
+					for(int i = 0; i < resuts.length; i++) {
+						String info[] = resuts[i].split("#");
+						int trow = Integer.parseInt(info[0]);
+						int tcol = Integer.parseInt(info[1]);
+						if(info[2].equals("missed")) {
+							lblAttackGrid[trow][tcol].setText("MISS");
+							lblAttackGrid[trow][tcol].setBackground(Color.WHITE);
+							lblAttackGrid[trow][tcol].setOpaque(true);
+							salvaResult += "missed ";
+						}
+						else {
+							lblAttackGrid[trow][tcol].setText("*HIT");
+							lblAttackGrid[trow][tcol].setBackground(Color.GREEN);
+							lblAttackGrid[trow][tcol].setOpaque(true);
+							salvaResult += "success ";
+						}
+					}
+					
+					result = salvaResult;
+				}
+			}
+			
+			lblAttackGrid[row][col].setEnabled(false);
+			result = "Prev Turn Result: " + result;
+			resultLabel.setText(result);
+			
+			scores.setText(Game.gameScores);
+			
+			if(Game.checkIfGameWon() == true) {
+				gameStatus.setText("Game Over. Winner is " + Game.getWinner());
+				JOptionPane.showMessageDialog(null, 
+						Game.getWinner() + " won the game. Scores: " + 
+								tmpPlayerName + "(" + gameController.getP1Score() + ")" +
+								" AND AI (" + gameController.getAIScore() + ")", 
+						"Game Over", JOptionPane.INFORMATION_MESSAGE);
+				System.exit(0);
+			}
+		}
 	}
 }
