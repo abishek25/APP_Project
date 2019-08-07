@@ -10,10 +10,17 @@ import controller.GameController;
 import model.Board;
 import view.Window;
 
+/**
+ * This class contains test cases for multiplayer ship placement
+ *
+ */
 class MultiplayerShipPlacement {
 
 	Window win;
 
+	/**
+	 * The setup function for each test case
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();

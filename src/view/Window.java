@@ -356,7 +356,7 @@ public class Window implements Serializable {
 	 * @param j Column co-ordinate
 	 * @param shipSpace The length of the ship
 	 * @param lblShipPlacementGrid The board on which ship needs to be placed
-	 * @return
+	 * @return the result
 	 */
 	public boolean checkVerticalParallel(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
 		if(i > 0) {
@@ -385,7 +385,7 @@ public class Window implements Serializable {
 	 * @param j Column co-ordinate
 	 * @param shipSpace The length of the ship
 	 * @param lblShipPlacementGrid The board on which ship needs to be placed
-	 * @return
+	 * @return the result
 	 */
 	public boolean checkHorizontalParallel(int i, int j, int shipSpace, JLabel[][] lblShipPlacementGrid) {
 		if(j > 0) {

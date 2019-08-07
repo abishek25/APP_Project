@@ -13,10 +13,17 @@ import model.Ship;
 import view.Menu;
 import view.Window;
 
+/**
+ * This class tests for startup scenarios
+ *
+ */
 class StartupTests {
 
 	Window win;
 
+	/**
+	 * The setup function of test cases
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();
@@ -120,6 +127,9 @@ class StartupTests {
 		assertNotNull(win.createMenu());
 	}
 	
+	/**
+	 * Function to test ship holes
+	 */
 	@Test
 	void testShipHoles() {
 		Ship s = new Ship("testship", 4);

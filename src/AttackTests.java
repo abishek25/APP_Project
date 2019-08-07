@@ -10,10 +10,17 @@ import controller.GameController;
 import model.Board;
 import view.Window;
 
+/**
+ * This class tests for attack related cases
+ *
+ */
 class AttackTests {
 
 	Window win;
 
+	/**
+	 * Setup function to run before reach test case
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();

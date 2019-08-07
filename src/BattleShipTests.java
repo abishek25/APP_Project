@@ -22,6 +22,9 @@ class BattleShipTests {
 	
 	Window win;
 
+	/**
+	 * Setup function to run before reach test case
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();

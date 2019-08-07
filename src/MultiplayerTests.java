@@ -12,10 +12,17 @@ import model.Game;
 import view.Menu;
 import view.Window;
 
+/**
+ * This class tests for multiplayer scenarios
+ *
+ */
 class MultiplayerTests {
 
 	Window win;
 
+	/**
+	 * The setup function for multiplayer scenarios
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();
@@ -35,43 +42,63 @@ class MultiplayerTests {
 		Window.DEV_TEST = 5;
 	}
 
-	
+	/**
+	 * Function to test own port
+	 */
 	@Test
 	public void testOwnPort() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.getOwnPort(), Menu.PORT_CREATOR);
 	}
 	
+	/**
+	 * Function to test own address
+	 */
 	@Test
 	public void testOwnAddress() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.getOwnAddr(), Menu.ADDR_CREATOR);
 	}
 	
+	/**
+	 * Function to test other player port
+	 */
 	@Test
 	public void testOtherPlayerPort() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.getOtherPlayerPort(), Menu.PORT_JOINER);
 	}
 	
+	/**
+	 * Function to test other player address
+	 */
 	@Test
 	public void testOtherPlayerAddr() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.getOtherPlayerAddr(), Menu.ADDR_JOINER);
 	}
 	
+	/**
+	 * Function to test opponent turn
+	 */
 	@Test
 	public void testOpponentTurn() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertFalse(win.gameController.checkIfOpponentTurn());
 	}
 	
+	/**
+	 * Function to test multiplayer turn
+	 */
 	@Test
 	public void testMultiplayerPlayerTurn() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.multiplayerGetCurrPlayerName(), "TestPlayer");
 	}
 	
+	/**
+	 * Function to test player ships alive
+	 */
 	@Test
 	public void testPlayerShipsAlive() {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);

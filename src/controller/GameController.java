@@ -29,12 +29,20 @@ public class GameController implements Serializable {
 	/**
 	 * The parameterized constructor.
 	 * @param gameMode The game mode(Salva or Basic).
+	 * @param player1Name The player 1 name
 	 */
 	public GameController(int gameMode, String player1Name) {
 		this.gameMode = gameMode;
 		this.player1Name = player1Name;
 	}
 	
+	/**
+	 * The constructor for multiplayer with join and create
+	 * @param gameMode The game mode
+	 * @param player1Name The player one name
+	 * @param player2Name The player two name
+	 * @param creator The creator or not
+	 */
 	public GameController(int gameMode, String player1Name, String player2Name, Boolean creator) {
 		try {
 			if(player1Name == null || player2Name == null) {
@@ -56,6 +64,8 @@ public class GameController implements Serializable {
 	 * @param player1Name The player 1 name
 	 * @param board The game board
 	 * @param playerShips ships
+	 * @param player2board The player 2 board
+	 * @param player2Ships The player 2 ships
 	 */
 	public void createGame(String player1Name, Board board, String[] playerShips, Board player2board, String[] player2Ships) {
 		if(player2board == null) {
@@ -63,6 +73,11 @@ public class GameController implements Serializable {
 		}
 	}
 	
+	/**
+	 * The create game function for multiplayer
+	 * @param board The game board
+	 * @param playerShips The ships for player
+	 */
 	public void createMultiplayerGame(Board board, String[] playerShips) {
 		if(creator == true) {
 			System.out.println("Game Created By: " + this.player1Name);
@@ -92,6 +107,10 @@ public class GameController implements Serializable {
 		return game.getCurrPlayer();
 	}
 	
+	/**
+	 * The function to get multiplayer turn
+	 * @return The multiplayer turn
+	 */
 	public String multiplayerGetCurrPlayerName() {
 		return game.multiplayerGetCurrPlayerName();
 	}
@@ -106,6 +125,12 @@ public class GameController implements Serializable {
 		return game.processAttack(row, col);
 	}
 	
+	/**
+	 * Function to process multiplayer attack
+	 * @param row The attack row
+	 * @param col The attack column
+	 * @return The attack result
+	 */
 	public String processMultiAttack(int row, int col) {
 		return game.processMultiAttack(row, col);
 	}
@@ -126,30 +151,60 @@ public class GameController implements Serializable {
 		return game.getPlayerTwoResults();
 	}
 	
+	/**
+	 * The function to get game type
+	 * @return The game type
+	 */
 	public int getGameTypeMode() {
 		return game.getGameTypeMode();
 	}
 	
+	/**
+	 * The function to check opponent turn
+	 * @return The result
+	 */
 	public boolean checkIfOpponentTurn() {
 		return game.checkIfOpponentTurn();
 	}
 	
+	/**
+	 * Function to get other player port
+	 * @return The other player port
+	 */
 	public int getOtherPlayerPort() {
 		return game.otherPlayerPort;
 	}
 	
+	/**
+	 * Function to get other player address
+	 * @return The other player address
+	 */
 	public String getOtherPlayerAddr() {
 		return game.otherPlayerAddr;
 	}
 	
+	/**
+	 * Function to get own port
+	 * @return The own port
+	 */
 	public int getOwnPort() {
 		return game.ownPort;
 	}
 	
+	/**
+	 * Function to get own port
+	 * @return The own port
+	 */
 	public String getOwnAddr() {
 		return game.ownAddr;
 	}
 	
+	/**
+	 * Function to process incoming attack
+	 * @param row The attack row
+	 * @param col The attack col
+	 * @return The attack result
+	 */
 	public String processIncomingAttack(int row, int col) {
 		return game.processIncomingAttack(row, col);
 	}

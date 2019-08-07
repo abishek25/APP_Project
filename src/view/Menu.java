@@ -23,6 +23,10 @@ import controller.GameController;
 import model.Board;
 import model.Game;
 
+/**
+ * The class that starts everything and creates the ui
+ *
+ */
 public class Menu {
 	
 	public static int PORT_CREATOR = 4444;
@@ -144,6 +148,12 @@ public class Menu {
 		return newGame;
 	}
 
+	/**
+	 * Function to create multiplayer game
+	 * @param playerName the player name
+	 * @param gameMode Teh game mode
+	 * @return The result
+	 */
 	public String multiplayerCreateGame(String playerName, int gameMode) {
 		System.out.println("Game created at socket 4444. Waiting for players");
 		
@@ -174,6 +184,11 @@ public class Menu {
 		return null;
 	}
 	
+	/**
+	 * The function to join multiplayer game
+	 * @param playername The player name
+	 * @return The other player name
+	 */
 	public String multiplayerJoinGame(String playername) {
 		try {
 			DatagramSocket socket = new DatagramSocket(PORT_JOINER);
@@ -203,6 +218,10 @@ public class Menu {
 		return null;
 	}
 	
+	/**
+	 * Function to create saved game menu
+	 * @return The save game menu
+	 */
 	public JMenuItem createSaveGameMenuItem() {
 		JMenuItem saveGame = new JMenuItem("Save Game");
 		saveGame.addActionListener(new ActionListener() {
@@ -214,6 +233,10 @@ public class Menu {
 		return saveGame;
 	}
 	
+	/**
+	 * Function to create to load game menu
+	 * @return Teh laod game menu
+	 */
 	public JMenuItem createLoadGameMenuItem() {
 		JMenuItem loadGame = new JMenuItem("Load Game");
 		loadGame.addActionListener(new ActionListener() {
@@ -225,6 +248,9 @@ public class Menu {
 		return loadGame;
 	}
 
+	/**
+	 * Function to save game
+	 */
 	public void saveGame() {
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
@@ -243,6 +269,9 @@ public class Menu {
 		}
 	}
 	
+	/**
+	 * Function to load game
+	 */
 	public void loadGame() {
 		try {
 			ObjectInputStream iis = new ObjectInputStream(new FileInputStream(SAVE_GAME_PATH + "game"));

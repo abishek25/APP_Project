@@ -10,10 +10,17 @@ import controller.GameController;
 import model.Board;
 import view.Window;
 
+/**
+ * This class tests for ship placement scenarios
+ *
+ */
 class ShipPlacementTests {
 
 	Window win;
 	
+	/**
+	 * The function to setup before  each test case
+	 */
 	@BeforeEach 
 	public void setup() {
 		win = new Window();

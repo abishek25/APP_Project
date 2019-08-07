@@ -188,9 +188,12 @@ public class Game implements Serializable {
 	/**
 	 * Constructor to set/initialize information about two players
 	 * @param playerOneName Player 1 name
-	 * @param player1Positions Player 1 positions
+	 * @param board Player 1 board
+	 * @param gameMode the game mode
+	 * @param playerShips the player 1 ships
 	 * @param playerTwoName Player 2 name
-	 * @param player2Positions Player 2 positions
+	 * @param board2 Player 2 board
+	 * @param player2Ships  player 2 ships
 	 */
 	public Game(String playerOneName, Board board, int gameMode, String[] playerShips, String playerTwoName, Board board2, String[] player2Ships) {
 		players = new Player[2];
@@ -208,6 +211,19 @@ public class Game implements Serializable {
 		timer.start();
 	}
 	
+	/**
+	 * Constructor to handle multiplayer creation
+	 * @param playerName The player name
+	 * @param board The game baord
+	 * @param gameMode The game mode
+	 * @param playerShips The player ships
+	 * @param otherPlayerName The othe rplayer name
+	 * @param creator If the player is a creator
+	 * @param otherPort The other player port
+	 * @param otherPlayerAddr The other player address
+	 * @param ownPort The player own port
+	 * @param ownAddr The player own address
+	 */
 	public Game(String playerName, Board board, int gameMode, String[] playerShips, String otherPlayerName, 
 			boolean creator, int otherPort, String otherPlayerAddr, int ownPort, String ownAddr) {
 		players = new Player[1];
@@ -271,6 +287,10 @@ public class Game implements Serializable {
 		return this.players[currPlayer];
 	}
 	
+	/**
+	 * Function to get current player name in multiplayer game
+	 * @return The current player name
+	 */
 	public String multiplayerGetCurrPlayerName() {
 		return this.multiplayerCurrentPlayerName;
 	}
@@ -458,6 +478,12 @@ public class Game implements Serializable {
 		return result;
 	}
 	
+	/**
+	 * Function to check attack for multiplayer scenario
+	 * @param row The attack row
+	 * @param col The attack col
+	 * @return The result
+	 */
 	public String multiCheckAttack(int row, int col) {
 		try {
 			System.out.println("Connecting to socket at " + (this.ownPort + 1));
@@ -487,6 +513,12 @@ public class Game implements Serializable {
 		return null;
 	}
 	
+	/**
+	 * The multiplayer regular game attack
+	 * @param row The attack row
+	 * @param col The attack col
+	 * @return The attack result
+	 */
 	public String multiRegularAttack(int row, int col) {
 		String result = multiCheckAttack(row, col);
 		
@@ -584,6 +616,12 @@ public class Game implements Serializable {
 		}
 	}
 	
+	/**
+	 * Function to check multiplayer salva attack
+	 * @param row The attack row
+	 * @param col The attack column
+	 * @return The attack result
+	 */
 	public String multiSalvaAttack(int row, int col) {
 		String result = multiCheckAttack(row, col);
 		if(result.equals(Player.ATTACK_HIT)) {
@@ -648,6 +686,12 @@ public class Game implements Serializable {
 		return result;
 	}
 	
+	/**
+	 * The multiplayer attack
+	 * @param row The attack row
+	 * @param col The attack col
+	 * @return The attack result
+	 */
 	public String processMultiAttack(int row, int col) {
 		String result = "";
 		
@@ -718,10 +762,18 @@ public class Game implements Serializable {
 		return playerTwoScore;
 	}
 	
+	/**
+	 * Function to get game type
+	 * @return The game type
+	 */
 	public int getGameTypeMode() {
 		return gameMode;
 	}
 	
+	/**
+	 * Check if turn is for opponent
+	 * @return The result
+	 */
 	public boolean checkIfOpponentTurn() {
 		if(multiplayerCurrentPlayerName.equals(players[0].name) == true) {
 			return false;
@@ -729,22 +781,44 @@ public class Game implements Serializable {
 		return true;
 	}
 	
+	/**
+	 * The function to get othe rplayer port
+	 * @return Other player port
+	 */
 	public int getOtherPlayerPort() {
 		return otherPlayerPort;
 	}
 	
+	/**
+	 * Function to get other player address
+	 * @return Other player address
+	 */
 	public String getOtherPlayerAddr() {
 		return otherPlayerAddr;
 	}
 	
+	/**
+	 * Function to get own port
+	 * @return Own port
+	 */
 	public int getOwnPort() {
 		return this.ownPort;
 	}
 	
+	/**
+	 * Function to get own address
+	 * @return Own address
+	 */
 	public String getOwnAddr() {
 		return this.ownAddr;
 	}
 	
+	/**
+	 * Function to process incoming attack
+	 * @param row The attack row
+	 * @param col The attack column
+	 * @return The attack result
+	 */
 	public String processIncomingAttack(int row, int col) {
 		System.out.println("Processing incoming attack at " + players[0].getName());
 		String result = players[0].checkAttack(row, col);
