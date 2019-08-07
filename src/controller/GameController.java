@@ -36,6 +36,15 @@ public class GameController implements Serializable {
 	}
 	
 	public GameController(int gameMode, String player1Name, String player2Name, Boolean creator) {
+		try {
+			if(player1Name == null || player2Name == null) {
+				throw new IncompleteInfoException("Player names are null");
+			}
+		}
+		catch(IncompleteInfoException e) {
+			System.out.println(e.getMessage());
+		}
+		
 		this.gameMode = gameMode;
 		this.player1Name = player1Name;
 		this.player2Name = player2Name;
@@ -49,11 +58,8 @@ public class GameController implements Serializable {
 	 * @param playerShips ships
 	 */
 	public void createGame(String player1Name, Board board, String[] playerShips, Board player2board, String[] player2Ships) {
-		if(this.player2Name == null) {
+		if(player2board == null) {
 			game = new Game(this.player1Name, board, gameMode, playerShips);
-		}
-		else {
-			game = new Game(this.player1Name, board, gameMode, playerShips, this.player2Name, player2board, player2Ships);
 		}
 	}
 	

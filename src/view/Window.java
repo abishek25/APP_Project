@@ -66,7 +66,7 @@ public class Window implements Serializable {
 	
 	boolean isMultiplayer;
 	
-	public static int DEV_TEST = 1;
+	public static int DEV_TEST = 0;
 	String networkPlayerName;
 	
 	static int multiplayerPort = 4444;

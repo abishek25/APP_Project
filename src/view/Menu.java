@@ -31,7 +31,7 @@ public class Menu {
 	public static String ADDR_CREATOR = "localhost";
 	public static String ADDR_JOINER = "localhost";
 	
-	Window win;
+	public Window win;
 	String SAVE_GAME_PATH = "F:\\savedgame\\";
 
 	/**
@@ -76,6 +76,7 @@ public class Menu {
 				boolean gameJoining = false;
 				
 				//if(Window.DEV_TEST != 1) {
+				if(multiplayer == true) {
 					String createJoinStr = JOptionPane.showInputDialog("Are you creating game or joining? (1 for Creation, Anything else for Joining)");
 					if(createJoinStr.equals("1")) {
 						gameCreating = true;
@@ -83,6 +84,7 @@ public class Menu {
 					else {
 						gameJoining = true;
 					}
+				}
 				//}
 				
 				String strGameMode = "hj";

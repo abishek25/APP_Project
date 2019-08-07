@@ -15,7 +15,7 @@ public class Player implements Serializable {
 	String name;
 	public Ship[] ships;
 	Board board;
-	int numShipsAlive;
+	public int numShipsAlive;
 	
 	/**
 	 * Function to initialize the ships
@@ -100,13 +100,23 @@ public class Player implements Serializable {
 		ships[3] = new Ship("Submarine", 3);
 		ships[4] = new Ship("Destroyer", 2);
 		
-		for(int i = 0; i < 5; i++) {
-			if(playerShips[i] == null) {
-				break;
+		try {
+			for(int i = 0; i < 5; i++) {
+				if(playerShips[i] == null) {
+					break;
+				}
+				String[] pos = playerShips[i].split(",");
+				for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
+					ships[i].unfilledHoles[j] = pos[j];
+				}
 			}
-			String[] pos = playerShips[i].split(",");
-			for(int j = 0; j < ships[i].unfilledHoles.length; j++) {
-				ships[i].unfilledHoles[j] = pos[j];
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
+			try {
+				throw new InvalidShipException("Number of ships should be 5");
+			}
+			catch(InvalidShipException ee) {
+				System.out.println(ee.getMessage());
 			}
 		}
 		

@@ -132,7 +132,7 @@ public class Game implements Serializable {
 		String aiPositions = "";
 		for(int i = 0; i < shipSizes.length; i++) {
 			if(rows.size() == 0) {
-				
+				break;
 			}
 			Collections.shuffle(rows);
 			int row = rows.remove(0);
