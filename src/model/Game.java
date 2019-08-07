@@ -31,7 +31,7 @@ public class Game implements Serializable {
 	int mode;
 	public int gameMode;
 	
-	public static ArrayList<String> salvaAttackRes;
+	public ArrayList<String> salvaAttackRes;
 	
 	int currPlayer;
 	public static boolean isFinished;

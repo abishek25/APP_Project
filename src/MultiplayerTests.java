@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import controller.GameController;
 import model.Board;
 import model.Game;
+import model.Player;
 import view.Menu;
 import view.Window;
 
@@ -131,4 +132,14 @@ class MultiplayerTests {
 		win.gameController.createMultiplayerGame(win.board, win.playerShips);
 		assertEquals(win.gameController.getGame().getPlayerOneResults(), 0);
 	}
+	
+	/*
+	@Test
+	public void testInvalidPlayer() {
+		String[] t = new String[1];
+		t[0] = "asd";
+		Player p = new Player("asd", new Board(), t);
+		assertNotNull(p);
+	}
+	*/
 }
