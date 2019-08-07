@@ -527,7 +527,7 @@ public class Game implements Serializable {
 		resetPlayerTimer();
 		
 		if(isFinished == true) {
-			winnerName = this.multiplayerCurrentPlayerName;
+			winnerName = this.otherPlayerName;
 		}
 		else {
 			this.multiplayerCurrentPlayerName = this.otherPlayerName;
@@ -640,7 +640,7 @@ public class Game implements Serializable {
 			}
 			
 			salvaAttackRes.clear();
-			updateGameStatus(players[1].board);
+			//updateGameStatus(players[1].board);
 			
 			if(isFinished == true) {
 				winnerName = this.multiplayerCurrentPlayerName;
@@ -824,6 +824,7 @@ public class Game implements Serializable {
 		String result = players[0].checkAttack(row, col);
 		updateGameStatus(players[0].getBoard());
 		this.multiplayerCurrentPlayerName = players[0].getName();
+		resetPlayerTimer();
 		return result;
 	}
 }

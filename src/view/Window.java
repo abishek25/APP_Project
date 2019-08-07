@@ -101,7 +101,7 @@ public class Window implements Serializable {
 		
 		gameFrame.revalidate();
 		refreshBoard();
-		JOptionPane.showMessageDialog(null, "Game Begins");
+		JOptionPane.showMessageDialog(null, "All ship placed");
 	}
 	
 	public void createMultiGameAndPlayer(Board board) {
@@ -129,7 +129,7 @@ public class Window implements Serializable {
 		
 		gameFrame.revalidate();
 		refreshBoard();
-		JOptionPane.showMessageDialog(null, "Game Begins");
+		JOptionPane.showMessageDialog(null, "All ship placed");
 		receiveAttack.start();
 	}
 	
