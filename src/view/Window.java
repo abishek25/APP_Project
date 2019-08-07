@@ -691,7 +691,7 @@ public class Window implements Serializable {
 		
 	}
 	
-	Thread receiveAttack = new Thread() {
+	transient Thread receiveAttack = new Thread() {
 		public void run() {
 			while(true) {
 				try {
